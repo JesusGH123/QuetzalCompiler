@@ -2,28 +2,27 @@ skippedCharacters = [" ", "\t", "\n", "\r"]
 characterLiterals = ["n","r","t", "'", '"']
 
 separators = {
-     "+": "ADD", "-": "SUB", ",": "COMMA",
-     "and": "AND","or": "OR",
-    "(": "LPAREN", ")": "RPAREN", "[": "LSQUARE", "]": "RSQUARE", "{": "LCURL", "}": "RCURL",
-    "*": "MULT", "%": "MOD", "/": "DIV",
-    ":": "COLON", ";": "SEMICOLON",
-    "=": "ASSIGNMENT", "+=": "ADD_ASSIGNMENT", "-=": "SUB_ASSIGNMENT", "*=": "MULT_ASSIGNMENT", "/=": "DIV_ASSIGNMENT", "%=": "MOD_ASSIGNMENT",
-    "<": "LANGLE", ">": "RANGLE", "<=": "LE", ">=": "GE",
-    "!=": "EXCL_EQ", "==": "EQEQ", "'": "CHARACTER", '"': "STRING", "f": "FUNCTION_CALL",
-    "printi": "PRINT_I", "printc": "PRINT_C", "prints": "PRINT_S", "println": "PRINT_LN",
-    "new": "NEW", "size": "SIZE", "add": "ADD", "get": "GET_", "set(": "SET_"
+     "+": 1, "-": 2, ",": 3,
+     "and": 4,"or": 5,
+    "(": 6, ")": 7, "[": 8, "]": 9, "{": 10, "}": 11,
+    "*": 12, "%": 13, "/": 14,
+    ":": 15, ";": 16,
+    "=": 17, "+=": 18, "-=": 19, "*=": 20, "/=": 21, "%=": 22,
+    "<": 23, ">": 24, "<=": 25, ">=": 26,
+    "!=": 27, "==": 28, "'": 29, '"': 30,
+    "printi": 32, "printc": 33, "prints": 34, "println": 35,
+    "new": 36, "size": 37, "add": 38, "get": 39, "set": 40
 }
 
 reservedWords = {
     #Keywords
-    "return": "RETURN", "break": "BREAK", 
-    "file": "FILE", "field": "FIELD", "property": "PROPERTY", "get": "GET", "set": "SET", "receiver": "RECEIVER",
-    "var": "VAR", "inc": "INCREMENT", "dec": "DECREMENT", "if": "IF", "else": "ELSE", "elif": "ELIF",
-    "loop": "LOOP",  "while": "WHILE", "throw": "THROW", "return": "RETURN", "as": "AS", "is": "IS", "in": "IN", "not": "NOT",
+    "return": 41, "break": 42, 
+    "file": 43, "field": 44, "property": 45, "get": 46, "set": 47, "receiver": 48,
+    "var": 49, "inc": 50, "dec": 51, "if": 52, "else": 53, "elif": 54,
+    "loop": 55,  "while": 56, "throw": 57, "return": 58, "as": 59, "is": 60, "in": 61, "not": 62, "f": 31,
 
     #Section: Literals
-    "true": "BooleanLiteral", "false": "BooleanLiteral",
-
+    "true": 100, "false": 101,
 }
 
 alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',

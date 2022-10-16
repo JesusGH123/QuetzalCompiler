@@ -94,14 +94,14 @@ def classifyTokens():
 
 def literalValidaton(token):
     if(token[0] == '"' and token[len(token)-1] == '"'):
-        print(token, "StringLiteral")
+        print(token, 102)
     elif(re.match(r'(^[0-9]*$)', token)):
-        print(token, "IntegerLiteral")
+        print(token, 103)
     elif(token[0] == '\\'):
         if(token[1] in characterLiterals):
-            print(token, "CharacterLiteral")
+            print(token, 104)
         elif(re.match(r'(^(\\u)[0-9][0-9][0-9][0-9][0-9][0-9]$)', token)):
-            print(token, "CharacterLiteral (Unicode)")
+            print(token, 105)
         else:
             Error(token)
     else:
@@ -111,7 +111,7 @@ def tokenValidation(token):
     for character in token:         #Validate each token
             if(character not in alphabet and character not in separators):
                 Error(token)
-    print(token, "ID")
+    print(token, 300)
 
 def Error(token):
     print(Fore.RED + "ERROR: Non recognized character at line " + searchError(token) + Fore.WHITE)
@@ -123,6 +123,5 @@ def searchError(IncorrectToken):
             return str(line+1) 
 
 # Driver code 
-
 readFile()
 lexicalAnalize()

@@ -16,6 +16,7 @@ reservedWords = SymbolTable.reservedWords
 alphabet = SymbolTable.alphabet
 characterLiterals = SymbolTable.characterLiterals
 readedTokens = []
+tokenList = []
 
 def readFile():
     global file
@@ -86,21 +87,27 @@ def classifyTokens():
     
     for i in range(len(readedTokens)):
         if(readedTokens[i] in separators):
+            tokenList.append(separators[readedTokens[i]])
             print(readedTokens[i], separators[readedTokens[i]])
         elif(readedTokens[i] in reservedWords):
+            tokenList.append(reservedWords[readedTokens[i]])
             print(readedTokens[i], reservedWords[readedTokens[i]])
         else:
             literalValidaton(readedTokens[i])
 
-def literalValidaton(token):
+def literalValidaton(token, secondLap = False):
     if(token[0] == '"' and token[len(token)-1] == '"'):
+        tokenList.append(102)
         print(token, 102)
-    elif(re.match(r'(^[0-9]*$)', token)):
+    elif(re.match(r'(^-?[0-9]*$)', token)):
+        tokenList.append(103)
         print(token, 103)
     elif(token[0] == '\\'):
         if(token[1] in characterLiterals):
+            tokenList.append(104)
             print(token, 104)
         elif(re.match(r'(^(\\u)[0-9][0-9][0-9][0-9][0-9][0-9]$)', token)):
+            tokenList.append(105)
             print(token, 105)
         else:
             Error(token)
@@ -108,9 +115,27 @@ def literalValidaton(token):
         tokenValidation(token)
 
 def tokenValidation(token):
+    if(token.__contains__('-')):
+        currToken = ''
+        for i in range(len(token)+1):
+            if(i<len(token) and token[i] == '-' and i != 0):
+                literalValidaton(currToken)
+                print('-', reservedWords['-'])
+                tokenList.append(reservedWords['-'])
+                currToken = ''
+            elif(i == len(token)):
+                literalValidaton(currToken)
+                currToken = ''
+            else:
+                currToken += token[i]
+        return
+
     for character in token:         #Validate each token
-            if(character not in alphabet and character not in separators):
-                Error(token)
+        if(character not in alphabet and character not in separators and character not in reservedWords):
+            Error(token)
+
+    #It is an ID
+    tokenList.append(300)
     print(token, 300)
 
 def Error(token):
@@ -125,3 +150,4 @@ def searchError(IncorrectToken):
 # Driver code 
 readFile()
 lexicalAnalize()
+print("TokenList: ", tokenList)

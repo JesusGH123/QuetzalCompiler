@@ -2,7 +2,7 @@ skippedCharacters = [" ", "\t", "\n", "\r"]
 characterLiterals = ["n","r","t", "'", '"']
 
 separators = {
-     "+": 1, "-": 2, ",": 3,
+     "+": 1, ",": 3,
      "and": 4,"or": 5,
     "(": 6, ")": 7, "[": 8, "]": 9, "{": 10, "}": 11,
     "*": 12, "%": 13, "/": 14,
@@ -16,7 +16,7 @@ separators = {
 
 reservedWords = {
     #Keywords
-    "return": 41, "break": 42, 
+    "return": 41, "break": 42, "-": 2,
     "file": 43, "field": 44, "property": 45, "get": 46, "set": 47, "receiver": 48,
     "var": 49, "inc": 50, "dec": 51, "if": 52, "else": 53, "elif": 54,
     "loop": 55,  "while": 56, "throw": 57, "return": 58, "as": 59, "is": 60, "in": 61, "not": 62, "f": 31,

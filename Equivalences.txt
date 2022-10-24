@@ -71,6 +71,5 @@
 "CharacterLiteral": 104
 "CharacterLiteral (Unicode)": 105
 
-
 --- ID ----------
 ID: 300

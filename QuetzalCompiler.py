@@ -41,13 +41,13 @@ def lexicalAnalize():
             elif(delimitedComment == True):     #Skip when analyzer is in multiline comment mode
                 continue
             else:
-                if(line[i] == '"' and stringMode == False):
+                if(line[i-1] != '\\' and line[i] == '"' and stringMode == False):
                     if(currToken != ""):
                         readedTokens.append(currToken)
                         currToken = ""
                     stringMode = True
                     currToken = currToken + line[i]
-                elif(line[i] == '"' and stringMode == True):
+                elif(line[i-1] != '\\' and line[i] == '"' and stringMode == True):
                     currToken = currToken + line[i]
                     readedTokens.append(currToken)
                     currToken  = ""
@@ -103,14 +103,18 @@ def literalValidaton(token, secondLap = False):
         tokenList.append(103)
         print(token, 103)
     elif(token[0] == '\\'):
-        if(token[1] in characterLiterals):
+        if(len(token) > 1):
+            if(token[1] in characterLiterals):
+                tokenList.append(104)
+                print(token, 104)
+            elif(re.match(r'(^(\\u)[0-9A-Za-z][0-9A-Za-z][0-9A-Za-z][0-9A-Za-z][0-9A-Za-z][0-9A-Za-z]$)', token)):
+                tokenList.append(105)
+                print(token, 105)
+            else:
+                Error(token)
+        else:
             tokenList.append(104)
             print(token, 104)
-        elif(re.match(r'(^(\\u)[0-9][0-9][0-9][0-9][0-9][0-9]$)', token)):
-            tokenList.append(105)
-            print(token, 105)
-        else:
-            Error(token)
     else:
         tokenValidation(token)
 
@@ -139,7 +143,7 @@ def tokenValidation(token):
     print(token, 300)
 
 def Error(token):
-    print(Fore.RED + "ERROR: Non recognized character at line " + searchError(token) + Fore.WHITE)
+    print(Fore.RED + "ERROR: Non recognized at line " + searchError(token) + Fore.WHITE)
     exit(-1)
 
 def searchError(IncorrectToken):

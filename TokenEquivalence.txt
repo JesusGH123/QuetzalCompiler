@@ -71,5 +71,6 @@
 "CharacterLiteral": 104
 "CharacterLiteral (Unicode)": 105
 
---- ID ----------
+--- Others ----------
 ID: 300
+End of string: 301

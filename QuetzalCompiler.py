@@ -9,20 +9,23 @@ import colorama
 import re
 from colorama import Fore
 
-#Variables
+#Imports
 skippedCharacters = SymbolTable.skippedCharacters
 separators = SymbolTable.separators
 reservedWords = SymbolTable.reservedWords
 alphabet = SymbolTable.alphabet
 characterLiterals = SymbolTable.characterLiterals
-readedTokens = []
-tokenList = []
+
+#Variables
+readedTokens = []   #For lexical analyzing
+tokenList = []      #For syntactical analyzing
 
 def readFile():
     global file
     with open(sys.argv[1]) as f:
         file = f.readlines() 
 
+# ---------------------------------- Lexical analyze --------------------------------------------------
 def lexicalAnalize():
     delimitedComment = False
     stringMode = False
@@ -151,7 +154,33 @@ def searchError(IncorrectToken):
         if IncorrectToken in file[line]:
             return str(line+1) 
 
+# ---------------------------------- Syntactical analyze --------------------------------------------------
+def syntacticalAnalize():
+    ROWS = 10
+    TERMINALS = 10
+    CONTENT = 10
+
+    actionTable=[[[0]*ROWS]*TERMINALS]*CONTENT
+    gotoTable = [[0]*ROWS]*TERMINALS
+    stack = []
+    currentToken = None
+    nextToken = None
+    requested = False
+    errorList = []
+    lexicalAnalizer = None #???
+    SLRGrammar = None
+    compiled = False
+    analyzerExit = False
+    column = -1
+
+    actionTable[0][0][0] = 'D'
+    actionTable[0][0][1] = '3'
+
+    
+
+
+
 # Driver code 
 readFile()
 lexicalAnalize()
-print("TokenList: ", tokenList)
+syntacticalAnalize()

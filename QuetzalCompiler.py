@@ -3,13 +3,13 @@
 #Mario Cuevas
 #Juan Pablo Hernandez
 
+#Imports
 import sys
 import SymbolTable
 import colorama
 import re
 from colorama import Fore
 
-#Imports
 skippedCharacters = SymbolTable.skippedCharacters
 separators = SymbolTable.separators
 reservedWords = SymbolTable.reservedWords
@@ -19,8 +19,14 @@ characterLiterals = SymbolTable.characterLiterals
 #Variables
 readedTokens = []  #For lexical analyzing
 tokenList = []  #For syntactical analyzing
+actionTable = [[[0 for k in range(CONTENT)] for j in range(TERMINALS)] for i in range(ROWS)]
+gotoTable = [[0 for j in range(TERMINALS)] for i in range(ROWS)]
 
-
+class Grammar:
+  def __init__(self, var, prod):
+    self.var = var
+    self.prod = prod
+    
 def readFile():
   global file
   with open(sys.argv[1]) as f:
@@ -171,31 +177,16 @@ def searchError(IncorrectToken):
       return str(line + 1)
 
 # --------------- Syntactical analyze --------------------------
-def syntacticalAnalize():
+def syntacticalInizialization():
   ROWS = 144
   TERMINALS = 70
   CONTENT = 2
 
-  actionTable = [[[0 for k in range(CONTENT)] for j in range(TERMINALS)] for i in range(ROWS)]
-
-  gotoTable = [[0] * ROWS] * TERMINALS
-  stack = []
-  currentToken = None
-  nextToken = None
-  requested = False
-  errorList = []
-  lexicalAnalizer = None  #???
-  SLRGrammar = None
-  compiled = False
-  analyzerExit = False
-  column = -1
-  
   actionTable[0][69][0] = "D"
   actionTable[0][69][1] = "3"
 
   actionTable[1][68][0] = "acc"
   #-----------------Analysis table----------------------------------------
-  #---------------------Mario-----------------------------
   #-----------State 2-----------------
   actionTable[2][48][0] = "D"
   actionTable[2][48][1] = "7"
@@ -856,8 +847,384 @@ def syntacticalAnalize():
   actionTable[50][63][0] = "D"
   actionTable[50][63][1] = "79" 
 
-  #---------------------Juanpa-----------------------------
-  #actionTable[estado][numero del terminal][caracterEnLaCadena]
+  #-----------State 51-----------------
+  actionTable[51][13][0] = "D"
+  actionTable[51][13][1] = "84"
+
+  #-----------State 52-----------------
+  actionTable[52][13][0] = "D"
+  actionTable[52][13][1] = "85"
+
+    #-----------State 53-----------------
+  actionTable[53][13][0] = "R"
+  actionTable[53][13][1] = "30"
+
+  actionTable[53][67][0] = "R"
+  actionTable[53][67][1] = "30"
+
+  actionTable[53][7][0] = "R"
+  actionTable[53][7][1] = "30"
+
+  actionTable[53][49][0] = "R"
+  actionTable[53][49][1] = "30"
+
+  actionTable[53][50][0] = "R"
+  actionTable[53][50][1] = "30"
+
+  actionTable[53][51][0] = "R"
+  actionTable[53][51][1] = "30"
+
+  actionTable[53][54][0] = "R"
+  actionTable[53][54][1] = "30"
+
+  actionTable[53][38][0] = "R"
+  actionTable[53][38][1] = "30"
+
+  actionTable[53][57][0] = "R"
+  actionTable[53][57][1] = "30" 
+
+  #-----------State 54-----------------
+  actionTable[54][67][0] = "D"
+  actionTable[54][67][1] = "70"
+
+  actionTable[54][3][0] = "D"
+  actionTable[54][3][1] = "74"
+
+  actionTable[54][1][0] = "D"
+  actionTable[54][1][1] = "67"
+
+  actionTable[54][39][0] = "D"
+  actionTable[54][39][1] = "68"
+
+  actionTable[54][61][0] = "D"
+  actionTable[54][61][1] = "69"
+
+  actionTable[54][5][0] = "D"
+  actionTable[54][5][1] = "75"
+
+  actionTable[54][65][0] = "D"
+  actionTable[54][65][1] = "76"
+
+  actionTable[54][64][0] = "D"
+  actionTable[54][64][1] = "77"
+
+  actionTable[54][66][0] = "D"
+  actionTable[54][66][1] = "78" 
+
+  actionTable[54][63][0] = "D"
+  actionTable[54][63][1] = "79" 
+
+  #-----------State 55-----------------
+  actionTable[55][69][0] = "D"
+  actionTable[55][69][1] = "28"
+
+  #-----------State 56-----------------
+  actionTable[56][13][0] = "R"
+  actionTable[56][13][1] = "42"
+
+  actionTable[56][67][0] = "R"
+  actionTable[56][67][1] = "42"
+
+  actionTable[56][7][0] = "R"
+  actionTable[56][7][1] = "42"
+
+  actionTable[56][49][0] = "R"
+  actionTable[56][49][1] = "42"
+
+  actionTable[56][50][0] = "R"
+  actionTable[56][50][1] = "42"
+
+  actionTable[56][51][0] = "R"
+  actionTable[56][51][1] = "42"
+
+  actionTable[56][54][0] = "R"
+  actionTable[56][54][1] = "42"
+
+  actionTable[56][38][0] = "R"
+  actionTable[56][38][1] = "42"
+
+  actionTable[56][57][0] = "R"
+  actionTable[56][57][1] = "42" 
+
+  #-----------State 57-----------------
+  actionTable[57][13][0] = "D"
+  actionTable[57][13][1] = "88"
+
+   #-----------State 58-----------------
+  actionTable[58][69][0] = "R"
+  actionTable[58][69][1] = "45"
+
+  actionTable[58][13][0] = "R"
+  actionTable[58][13][1] = "45"
+
+  actionTable[58][2][0] = "R"
+  actionTable[58][2][1] = "45"
+
+  actionTable[58][4][0] = "R"
+  actionTable[58][4][1] = "45"
+
+  actionTable[58][41][0] = "D"
+  actionTable[58][41][1] = "89"
+
+   #-----------State 59-----------------
+  actionTable[59][69][0] = "R"
+  actionTable[59][69][1] = "47"
+
+  actionTable[59][13][0] = "R"
+  actionTable[59][13][1] = "47"
+
+  actionTable[59][2][0] = "R"
+  actionTable[59][2][1] = "47"
+
+  actionTable[59][4][0] = "R"
+  actionTable[59][4][1] = "47"
+
+  actionTable[59][41][0] = "R"
+  actionTable[59][41][1] = "47"
+  
+  actionTable[59][40][0] = "D"
+  actionTable[59][40][1] = "90"
+
+   #-----------State 60-----------------
+  actionTable[60][69][0] = "R"
+  actionTable[60][69][1] = "49"
+
+  actionTable[60][13][0] = "R"
+  actionTable[60][13][1] = "49"
+
+  actionTable[60][2][0] = "R"
+  actionTable[60][2][1] = "49"
+
+  actionTable[60][4][0] = "R"
+  actionTable[60][4][1] = "49"
+
+  actionTable[60][41][0] = "R"
+  actionTable[60][41][1] = "49"
+  
+  actionTable[60][40][0] = "R"
+  actionTable[60][40][1] = "49"
+
+  actionTable[60][25][0] = "D"
+  actionTable[60][25][1] = "92"
+  
+  actionTable[60][24][0] = "D"
+  actionTable[60][24][1] = "93"
+
+   #-----------State 61-----------------
+  actionTable[61][69][0] = "R"
+  actionTable[61][69][1] = "51"
+
+  actionTable[61][13][0] = "R"
+  actionTable[61][13][1] = "51"
+
+  actionTable[61][2][0] = "R"
+  actionTable[61][2][1] = "51"
+
+  actionTable[61][4][0] = "R"
+  actionTable[61][4][1] = "51"
+
+  actionTable[61][41][0] = "R"
+  actionTable[61][41][1] = "51"
+  
+  actionTable[61][40][0] = "R"
+  actionTable[61][40][1] = "51"
+
+  actionTable[61][25][0] = "R"
+  actionTable[61][25][1] = "51"
+  
+  actionTable[61][24][0] = "R"
+  actionTable[61][24][1] = "51"
+
+  actionTable[61][20][0] = "D"
+  actionTable[61][20][1] = "95"
+  
+  actionTable[61][22][0] = "D"
+  actionTable[61][22][1] = "96"
+
+  actionTable[61][21][0] = "D"
+  actionTable[61][21][1] = "97"
+  
+  actionTable[61][23][0] = "D"
+  actionTable[61][23][1] = "98"
+
+   #-----------State 62-----------------
+  actionTable[62][69][0] = "R"
+  actionTable[62][69][1] = "55"
+
+  actionTable[62][13][0] = "R"
+  actionTable[62][13][1] = "55"
+
+  actionTable[62][2][0] = "R"
+  actionTable[62][2][1] = "55"
+
+  actionTable[62][4][0] = "R"
+  actionTable[62][4][1] = "55"
+
+  actionTable[62][41][0] = "R"
+  actionTable[62][41][1] = "55"
+  
+  actionTable[62][40][0] = "R"
+  actionTable[62][40][1] = "55"
+
+  actionTable[62][25][0] = "R"
+  actionTable[62][25][1] = "55"
+  
+  actionTable[62][24][0] = "R"
+  actionTable[62][24][1] = "55"
+
+  actionTable[62][20][0] = "R"
+  actionTable[62][20][1] = "55"
+  
+  actionTable[62][22][0] = "R"
+  actionTable[62][22][1] = "55"
+
+  actionTable[62][21][0] = "R"
+  actionTable[62][21][1] = "55"
+  
+  actionTable[62][23][0] = "R"
+  actionTable[62][23][1] = "55"
+
+  actionTable[62][1][0] = "D"
+  actionTable[62][1][1] = "100"
+  
+  actionTable[62][39][0] = "D"
+  actionTable[62][39][1] = "101"
+
+ #-----------State 63-----------------
+  actionTable[63][69][0] = "R"
+  actionTable[63][69][1] = "61"
+
+  actionTable[63][13][0] = "R"
+  actionTable[63][13][1] = "61"
+
+  actionTable[63][2][0] = "R"
+  actionTable[63][2][1] = "61"
+
+  actionTable[63][4][0] = "R"
+  actionTable[63][4][1] = "61"
+
+  actionTable[63][41][0] = "R"
+  actionTable[63][41][1] = "61"
+  
+  actionTable[63][40][0] = "R"
+  actionTable[63][40][1] = "61"
+
+  actionTable[63][25][0] = "R"
+  actionTable[63][25][1] = "61"
+  
+  actionTable[63][24][0] = "R"
+  actionTable[63][24][1] = "61"
+
+  actionTable[63][20][0] = "R"
+  actionTable[63][20][1] = "61"
+  
+  actionTable[63][22][0] = "R"
+  actionTable[63][22][1] = "61"
+
+  actionTable[63][21][0] = "R"
+  actionTable[63][21][1] = "61"
+  
+  actionTable[63][23][0] = "R"
+  actionTable[63][23][1] = "61"
+
+  actionTable[63][1][0] = "R"
+  actionTable[63][1][1] = "61"
+  
+  actionTable[63][39][0] = "R"
+  actionTable[63][39][1] = "61"
+
+  actionTable[63][9][0] = "D"
+  actionTable[63][9][1] = "103"
+
+  actionTable[63][11][0] = "D"
+  actionTable[63][11][1] = "104"
+  
+  actionTable[63][10][0] = "D"
+  actionTable[63][10][1] = "104"
+
+ #-----------State 64-----------------
+  actionTable[64][69][0] = "R"
+  actionTable[64][69][1] = "65"
+
+  actionTable[64][13][0] = "R"
+  actionTable[64][13][1] = "65"
+
+  actionTable[64][2][0] = "R"
+  actionTable[64][2][1] = "65"
+
+  actionTable[64][4][0] = "R"
+  actionTable[64][4][1] = "65"
+
+  actionTable[64][41][0] = "R"
+  actionTable[64][41][1] = "65"
+  
+  actionTable[64][40][0] = "R"
+  actionTable[64][40][1] = "65"
+
+  actionTable[64][25][0] = "R"
+  actionTable[64][25][1] = "65"
+  
+  actionTable[64][24][0] = "R"
+  actionTable[64][24][1] = "65"
+
+  actionTable[64][20][0] = "R"
+  actionTable[64][20][1] = "65"
+  
+  actionTable[64][22][0] = "R"
+  actionTable[64][22][1] = "65"
+
+  actionTable[64][21][0] = "R"
+  actionTable[64][21][1] = "65"
+  
+  actionTable[64][23][0] = "R"
+  actionTable[64][23][1] = "65"
+
+  actionTable[64][1][0] = "R"
+  actionTable[64][1][1] = "65"
+  
+  actionTable[64][39][0] = "R"
+  actionTable[64][39][1] = "65"
+
+  actionTable[64][9][0] = "R"
+  actionTable[64][9][1] = "65"
+
+  actionTable[64][11][0] = "R"
+  actionTable[64][11][1] = "65"
+  
+  actionTable[64][10][0] = "R"
+  actionTable[64][10][1] = "65"
+
+  #-----------State 65-----------------
+  actionTable[65][67][0] = "D"
+  actionTable[65][67][1] = "70"
+
+  actionTable[65][3][0] = "D"
+  actionTable[65][3][1] = "74"
+
+  actionTable[65][1][0] = "D"
+  actionTable[65][1][1] = "67"
+
+  actionTable[65][39][0] = "D"
+  actionTable[65][39][1] = "68"
+
+  actionTable[65][61][0] = "D"
+  actionTable[65][61][1] = "69"
+
+  actionTable[65][5][0] = "D"
+  actionTable[65][5][1] = "75"
+
+  actionTable[65][65][0] = "D"
+  actionTable[65][65][1] = "76"
+
+  actionTable[65][64][0] = "D"
+  actionTable[65][64][1] = "77"
+
+  actionTable[65][66][0] = "D"
+  actionTable[65][66][1] = "78" 
+
+  actionTable[65][63][0] = "D"
+  actionTable[65][63][1] = "79" 
+
   #-----------State 66-----------------
   actionTable[66][69][0]= "R"
   actionTable[66][69][0]= "70"
@@ -1933,7 +2300,6 @@ def syntacticalAnalize():
   actionTable[98][63][0]="R"
   actionTable[98][63][1]="59"
 
-  #---------------------Giuseppe------------------------------
   actionTable[99][67][0] = "D"
   actionTable[99][67][1] = "70"
 
@@ -2939,8 +3305,392 @@ def syntacticalAnalize():
   actionTable[142][52][0] = "R"
   actionTable[143][52][1] = "37"
 
+  # -------------------- Go to table ----------------------------
+  gotoTable[0][1] = 1
+  gotoTable[0][2] = 2
+
+  gotoTable[2][3] = 4
+  gotoTable[2][4] = 5
+  gotoTable[2][8] = 6
+
+  gotoTable[7][5] = 9
+  gotoTable[7][6] = 10
+
+  gotoTable[11][7] = 14
+
+  gotoTable[12][6] = 18
+  gotoTable[12][9] = 17
+
+  gotoTable[20][7]=22
+
+  gotoTable[23][10]=24
+
+  gotoTable[24][4]=27
+  gotoTable[24][11]=26
+
+  gotoTable[26][12]=30
+  gotoTable[26][13]=31
+  gotoTable[26][14]=32
+  gotoTable[26][15]=33
+  gotoTable[26][16]=34
+  gotoTable[26][17]=43
+  gotoTable[26][20]=35
+  gotoTable[26][23]=36
+  gotoTable[26][24]=37
+  gotoTable[26][25]=38
+  gotoTable[26][26]=39
+
+  gotoTable[47][17]=71
+  gotoTable[47][27]=57
+  gotoTable[47][28]=58
+  gotoTable[47][29]=59
+  gotoTable[47][30]=60
+  gotoTable[47][32]=61
+  gotoTable[47][34]=62
+  gotoTable[47][36]=63
+  gotoTable[47][38]=64
+  gotoTable[47][39]=65
+  gotoTable[47][40]=66
+  gotoTable[47][41]=72
+  gotoTable[47][42]=73
+
+  gotoTable[49][17]=71
+  gotoTable[49][27]=80
+  gotoTable[49][28]=58
+  gotoTable[49][29]=59
+  gotoTable[49][30]=60
+  gotoTable[49][32]=61
+  gotoTable[49][34]=62
+  gotoTable[49][36]=63
+  gotoTable[49][38]=64
+  gotoTable[49][39]=65
+  gotoTable[49][40]=66
+  gotoTable[49][41]=72
+  gotoTable[49][42]=73
+
+  gotoTable[50][17]=71
+  gotoTable[50][18]=81
+  gotoTable[50][27]=82
+  gotoTable[50][28]=58
+  gotoTable[50][29]=59
+  gotoTable[50][30]=60
+  gotoTable[50][32]=61
+  gotoTable[50][34]=62
+  gotoTable[50][36]=63
+  gotoTable[50][38]=64
+  gotoTable[50][39]=65
+  gotoTable[50][40]=66
+  gotoTable[50][41]=72
+  gotoTable[50][42]=73
+
+  gotoTable[54][17]=71
+  gotoTable[54][27]=86
+  gotoTable[54][28]=58
+  gotoTable[54][29]=59
+  gotoTable[54][30]=60
+  gotoTable[54][32]=61
+  gotoTable[54][34]=62
+  gotoTable[54][36]=63
+  gotoTable[54][38]=64
+  gotoTable[54][39]=65
+  gotoTable[54][40]=66
+  gotoTable[54][41]=72
+  gotoTable[54][42]=73
+
+  gotoTable[55][11]=87
+
+  gotoTable[60][31]=91
+
+  gotoTable[61][33]=94
+
+  gotoTable[62][35]=99
+
+  gotoTable[63][37]=102
+
+  gotoTable[65][17]=71
+  gotoTable[65][38]=106
+  gotoTable[65][39]=65
+  gotoTable[65][40]=66
+  gotoTable[65][41]=72
+  gotoTable[65][42]=73
+
+  gotoTable[74][17]=71
+  gotoTable[74][27]=107
+  gotoTable[74][28]=58
+  gotoTable[74][29]=59
+  gotoTable[74][30]=60
+  gotoTable[74][32]=61
+  gotoTable[74][34]=62
+  gotoTable[74][36]=63
+  gotoTable[74][38]=64
+  gotoTable[74][39]=65
+  gotoTable[74][40]=66
+  gotoTable[74][41]=72
+  gotoTable[74][42]=73
+
+  gotoTable[75][17]=71
+  gotoTable[75][18]=108
+  gotoTable[75][27]=82
+  gotoTable[75][28]=58
+  gotoTable[75][29]=59
+  gotoTable[75][30]=60
+  gotoTable[75][32]=61
+  gotoTable[75][34]=62
+  gotoTable[75][36]=63
+  gotoTable[75][38]=64
+  gotoTable[75][39]=65
+  gotoTable[75][40]=66
+  gotoTable[75][41]=72
+  gotoTable[75][42]=73
+
+  gotoTable[82][19]=111
+
+  gotoTable[87][12]=30
+  gotoTable[87][13]=31
+  gotoTable[87][14]=32
+  gotoTable[87][15]=33
+  gotoTable[87][16]=34
+  gotoTable[87][17]=43
+  gotoTable[87][20]=35
+  gotoTable[87][23]=36
+  gotoTable[87][24]=37
+  gotoTable[87][25]=38
+  gotoTable[87][26]=39
+ 
+  gotoTable[89][17] = 71
+  gotoTable[89][29] = 116
+  gotoTable[89][30] = 60
+  gotoTable[89][32] = 61
+  gotoTable[89][34] = 62
+  gotoTable[89][36] = 63
+  gotoTable[89][38] = 64
+  gotoTable[89][39] = 65
+  gotoTable[89][40] = 66
+  gotoTable[89][41] = 72
+  gotoTable[89][42] = 73
+
+  gotoTable[90][17] = 71
+  gotoTable[90][30] = 117
+  gotoTable[90][32] = 61
+  gotoTable[90][34] = 62
+  gotoTable[90][36] = 63
+  gotoTable[90][38] = 64
+  gotoTable[90][39] = 65
+  gotoTable[90][40] = 66
+  gotoTable[90][41] = 72
+  gotoTable[90][42] = 73
+
+  gotoTable[91][17] = 71
+  gotoTable[91][32] = 118
+  gotoTable[91][34] = 62
+  gotoTable[91][36] = 63
+  gotoTable[91][38] = 64
+  gotoTable[91][39] = 65
+  gotoTable[91][40] = 66
+  gotoTable[91][41] = 72
+  gotoTable[91][42] = 73
+
+  gotoTable[94][17] = 71
+  gotoTable[94][34] = 119
+  gotoTable[94][36] = 63
+  gotoTable[94][38] = 64
+  gotoTable[94][39] = 65
+  gotoTable[94][40] = 66
+  gotoTable[94][41] = 72
+  gotoTable[94][42] = 73
+
+  gotoTable[99][17] = 71
+  gotoTable[99][36] = 120
+  gotoTable[99][38] = 64
+  gotoTable[99][39] = 65
+  gotoTable[99][40] = 66
+  gotoTable[99][41] = 72
+  gotoTable[99][42] = 73
+
+  gotoTable[102][17] = 71
+  gotoTable[102][38] = 121
+  gotoTable[102][39] = 65
+  gotoTable[102][40] = 66
+  gotoTable[102][41] = 72
+  gotoTable[102][42] = 73
+
+  gotoTable[112][17] = 73
+  gotoTable[112][27] = 124
+  gotoTable[112][28] = 58
+  gotoTable[112][29] = 59
+  gotoTable[112][30] = 60
+  gotoTable[112][32] = 61
+  gotoTable[112][34] = 62
+  gotoTable[112][36] = 63
+  gotoTable[112][38] = 64
+  gotoTable[112][39] = 65
+  gotoTable[112][40] = 66
+  gotoTable[112][41] = 72
+  gotoTable[112][42] = 73
+
+  gotoTable[117][31] = 91
+  
+  gotoTable[118][33] = 94
+
+  gotoTable[119][35] = 99
+
+  gotoTable[120][37] = 102
+
+  gotoTable[124][19] = 126
+
+  gotoTable[125][11] = 127
+
+  gotoTable[127][12] = 30
+  gotoTable[127][13] = 31
+  gotoTable[127][14] = 32
+  gotoTable[127][15] = 33
+  gotoTable[127][16] = 34
+  gotoTable[127][17] = 43
+  gotoTable[127][20] = 35
+  gotoTable[127][23] = 36
+  gotoTable[127][24] = 37
+  gotoTable[127][25] = 38
+  gotoTable[127][26] = 39
+
+  gotoTable[128][21] = 129
+
+  gotoTable[129][22] = 131
+
+  gotoTable[135][17] = 71
+  gotoTable[135][27] = 137
+  gotoTable[135][28] = 58
+  gotoTable[135][29] = 59
+  gotoTable[135][30] = 60
+  gotoTable[135][32] = 61
+  gotoTable[135][34] = 62
+  gotoTable[135][36] = 63
+  gotoTable[135][38] = 64
+  gotoTable[135][39] = 65
+  gotoTable[135][40] = 66
+  gotoTable[135][41] = 72
+  gotoTable[135][42] = 73
+
+  gotoTable[136][11] = 138
+
+  gotoTable[138][12] = 30
+  gotoTable[138][13] = 31
+  gotoTable[138][14] = 32
+  gotoTable[138][15] = 33
+  gotoTable[138][16] = 34
+  gotoTable[138][17] = 43
+  gotoTable[138][20] = 35
+  gotoTable[138][23] = 36
+  gotoTable[138][24] = 37
+  gotoTable[138][25] = 38
+  gotoTable[138][26] = 39
+
+  gotoTable[141][11] = 142
+
+  gotoTable[142][12] = 30
+  gotoTable[142][13] = 31
+  gotoTable[142][14] = 32
+  gotoTable[142][15] = 33
+  gotoTable[142][16] = 34
+  gotoTable[142][17] = 43
+  gotoTable[142][20] = 35
+  gotoTable[142][23] = 36
+  gotoTable[142][24] = 37
+  gotoTable[142][25] = 38
+  gotoTable[142][26] = 39
+
+  # Grammar
+  SLRGrammar = []
+
+  SLRGrammar.append(Grammar("S", "program"))
+  SLRGrammar.append(Grammar("program", "def-list"))
+  SLRGrammar.append(Grammar("def-list", "def-list def"))
+  # @ symbolizes empty string
+  SLRGrammar.append(Grammar("def-list", "@"))
+  SLRGrammar.append(Grammar("def","var-def"))
+  SLRGrammar.append(Grammar("def", "fun-def"))
+  SLRGrammar.append(Grammar("var-def", "var var-list ;"))
+  SLRGrammar.append(Grammar("var-list", "id-list"))
+  SLRGrammar.append(Grammar("id-list", "id id-list-cont"))
+  SLRGrammar.append(Grammar("id-list-cont", ", id id-list-cont"))
+  SLRGrammar.append(Grammar("id-list-cont", "@"))
+  SLRGrammar.append(Grammar("fun-def", "id ( param-list ) { var-def-list stmt-list }"))
+  SLRGrammar.append(Grammar("param-list", "id-list"))
+  SLRGrammar.append(Grammar("param-list", "@"))
+  SLRGrammar.append(Grammar("var-def-list", "var-def-list var-def"))
+  SLRGrammar.append(Grammar("var-def-list", "@"))
+  SLRGrammar.append(Grammar("stmt-list", "stmt-list stmt"))
+  SLRGrammar.append(Grammar("stmt-list", "@"))
+  SLRGrammar.append(Grammar("stmt", "stmt-assign"))
+  SLRGrammar.append(Grammar("stmt", "stmt-incr"))
+  SLRGrammar.append(Grammar("stmt", "stmt-decr"))
+  SLRGrammar.append(Grammar("stmt", "stmt-fun-call"))
+  SLRGrammar.append(Grammar("stmt", "stmt-if"))
+  SLRGrammar.append(Grammar("stmt", "stmt-loop"))
+  SLRGrammar.append(Grammar("stmt", "stmt-break"))
+  SLRGrammar.append(Grammar("stmt", "stmt-return"))
+  SLRGrammar.append(Grammar("stmt", "stmt-empty"))
+  SLRGrammar.append(Grammar("stmt-assign", "id = expr ;"))
+  SLRGrammar.append(Grammar("stmt-incr", "inc id ;"))
+  SLRGrammar.append(Grammar("stmt-decr", "dec id ;"))
+  SLRGrammar.append(Grammar("stmt-fun-call", "fun-call ;"))
+  SLRGrammar.append(Grammar("fun-call", "id ( expr-list )"))
+  SLRGrammar.append(Grammar("expr-list", "expr expr-list-cont"))
+  SLRGrammar.append(Grammar("expr-list", "@"))
+  SLRGrammar.append(Grammar("expr-list-cont", ", expr expr-list-cont"))
+  SLRGrammar.append(Grammar("expr-list-cont", "@"))
+  SLRGrammar.append(Grammar("stmt-if", "if ( expr ) { stmt-list } else-if-list else-stmt"))
+  SLRGrammar.append(Grammar("else-if-list", "else-if-list elif ( expr ) { stmt-list }"))
+  SLRGrammar.append(Grammar("else-if-list", "@"))
+  SLRGrammar.append(Grammar("else-stmt","else { stmt-list }"))
+  SLRGrammar.append(Grammar("else-stmt","@"))
+  SLRGrammar.append(Grammar("stmt-loop","loop { stmt-list }"))
+  SLRGrammar.append(Grammar("stmt-break","break ;"))
+  SLRGrammar.append(Grammar("stmt-return","return expr ;"))
+  SLRGrammar.append(Grammar("stmt-empty",";"))
+  SLRGrammar.append(Grammar("expr","expr-or"))
+  SLRGrammar.append(Grammar("expr-or","expr-or or expr-and"))
+  SLRGrammar.append(Grammar("expr-or","expr-and"))
+  SLRGrammar.append(Grammar("expr-and","expr-and and expr-comp"))
+  SLRGrammar.append(Grammar("expr-and","expr-comp"))
+  SLRGrammar.append(Grammar("expr-comp","expr-comp op-comp expr-rel"))
+  SLRGrammar.append(Grammar("expr-comp","expr-rel"))
+  SLRGrammar.append(Grammar("op-comp","=="))
+  SLRGrammar.append(Grammar("op-comp","!="))
+  SLRGrammar.append(Grammar("expr-rel","expr-rel op-rel expr-add"))
+  SLRGrammar.append(Grammar("expr-rel","expr-add"))
+  SLRGrammar.append(Grammar("op-rel","<"))
+  SLRGrammar.append(Grammar("op-rel","<="))
+  SLRGrammar.append(Grammar("op-rel",">"))
+  SLRGrammar.append(Grammar("op-rel",">="))
+  SLRGrammar.append(Grammar("expr-add","expr-add op-add expr-mul"))
+  SLRGrammar.append(Grammar("expr-add","expr-mul"))
+  SLRGrammar.append(Grammar("op-add","+"))
+  SLRGrammar.append(Grammar("op-add","-"))
+  SLRGrammar.append(Grammar("expr-mul","exr-mul op-mul expr-unary"))
+  SLRGrammar.append(Grammar("expr-mul","expr-unary"))
+  SLRGrammar.append(Grammar("op-mul","*"))
+  SLRGrammar.append(Grammar("op-mul","/"))
+  SLRGrammar.append(Grammar("op-mul","%"))
+  SLRGrammar.append(Grammar("expr-unary","op-unary expr-unary"))
+  SLRGrammar.append(Grammar("expr-unary","expr-primary"))
+  SLRGrammar.append(Grammar("op-unary","+"))
+  SLRGrammar.append(Grammar("op-unary","-"))
+  SLRGrammar.append(Grammar("op-unary","not"))
+  SLRGrammar.append(Grammar("expr-primary","id"))
+  SLRGrammar.append(Grammar("expr-primary","fun-call"))
+  SLRGrammar.append(Grammar("expr-primary","array"))
+  SLRGrammar.append(Grammar("expr-primary","lit"))
+  SLRGrammar.append(Grammar("expr-primary","( expr )"))
+  SLRGrammar.append(Grammar("array","[ expr-list ]"))
+  SLRGrammar.append(Grammar("lit","lit-bool"))
+  SLRGrammar.append(Grammar("lit","lit-int"))
+  SLRGrammar.append(Grammar("lit","lit-char"))
+  SLRGrammar.append(Grammar("lit","str"))
+
 # Driver code
-readFile()
-lexicalAnalize()
-print("Token list: ", tokenList)
-syntacticalAnalize()
+#readFile()
+#lexicalAnalize()
+#tokenList.append(68)  #Append end of string
+#print("Token list: ", tokenList)
+syntacticalInizialization()
+print(gotoList)

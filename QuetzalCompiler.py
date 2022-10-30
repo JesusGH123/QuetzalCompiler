@@ -15,12 +15,20 @@ separators = SymbolTable.separators
 reservedWords = SymbolTable.reservedWords
 alphabet = SymbolTable.alphabet
 characterLiterals = SymbolTable.characterLiterals
+nonTerminals = SymbolTable.nonTerminals
 
 #Variables
 readedTokens = []  #For lexical analyzing
+
+currToken = None
+ROWS = 144; TERMINALS = 69; CONTENT = 2
 tokenList = []  #For syntactical analyzing
 actionTable = [[[0 for k in range(CONTENT)] for j in range(TERMINALS)] for i in range(ROWS)]
-gotoTable = [[0 for j in range(TERMINALS)] for i in range(ROWS)]
+gotoTable = [[-1 for j in range(TERMINALS)] for i in range(ROWS)]
+SLRGrammar = []
+pos = -1
+column = -1
+stack = [0]
 
 class Grammar:
   def __init__(self, var, prod):
@@ -29,7 +37,7 @@ class Grammar:
     
 def readFile():
   global file
-  with open(sys.argv[1]) as f:
+  with open("Code.txt") as f:
     file = f.readlines()
 
 # ----------------- Lexical analyze ----------------------------
@@ -102,7 +110,6 @@ def lexicalAnalize():
   classifyTokens()
 
 def classifyTokens():
-
   for i in range(len(readedTokens)):
     if (readedTokens[i] in separators):
       tokenList.append(separators[readedTokens[i]])
@@ -170,7 +177,6 @@ def Error(token):
         Fore.WHITE)
   exit(-1)
 
-
 def searchError(IncorrectToken):
   for line in range(len(file)):  #Search the error in the code
     if IncorrectToken in file[line]:
@@ -178,3428 +184,2945 @@ def searchError(IncorrectToken):
 
 # --------------- Syntactical analyze --------------------------
 def syntacticalInizialization():
-  ROWS = 144
-  TERMINALS = 70
-  CONTENT = 2
 
-  actionTable[0][69][0] = "D"
-  actionTable[0][69][1] = "3"
+  # --------- Action table --------------------
+  actionTable[0][48][0] = "R"
+  actionTable[0][48][1] = "3"
+  actionTable[0][67][0] = "R"
+  actionTable[0][67][1] = "3"
+  actionTable[0][68][0] = "R"
+  actionTable[0][68][1] = "3"
 
   actionTable[1][68][0] = "acc"
-  #-----------------Analysis table----------------------------------------
-  #-----------State 2-----------------
-  actionTable[2][48][0] = "D"
-  actionTable[2][48][1] = "7"
-
-  actionTable[2][67][0] = "D"
-  actionTable[2][67][1] = "8"
-  
-  actionTable[2][68][0] = "R"
-  actionTable[2][68][1] = "1"
-  #-----------State 3-----------------
-  actionTable[3][48][0] = "R"
-  actionTable[3][48][1] = "3"
-
-  actionTable[3][67][0] = "R"
-  actionTable[3][67][1] = "3"
-  
-  actionTable[3][68][0] = "R"
-  actionTable[3][68][1] = "3"
-  #-----------State 4-----------------
-  actionTable[4][48][0] = "R"
-  actionTable[4][48][1] = "2"
-
-  actionTable[4][67][0] = "R"
-  actionTable[4][67][1] = "2"
-  
-  actionTable[4][68][0] = "R"
-  actionTable[4][68][1] = "2"
-  #-----------State 5-----------------
-  actionTable[5][48][0] = "R"
-  actionTable[5][48][1] = "4"
-
-  actionTable[5][67][0] = "R"
-  actionTable[5][67][1] = "4"
-  
-  actionTable[5][68][0] = "R"
-  actionTable[5][68][1] = "4"
-  #-----------State 6-----------------
-  actionTable[6][48][0] = "R"
-  actionTable[6][48][1] = "5"
-
-  actionTable[6][67][0] = "R"
-  actionTable[6][67][1] = "5"
-  
-  actionTable[6][68][0] = "R"
-  actionTable[6][68][1] = "5"
-  #-----------State 7-----------------
-  actionTable[7][67][0] = "D"
-  actionTable[7][67][1] = "11"
-  #-----------State 8-----------------
-  actionTable[8][3][0] = "D"
-  actionTable[8][3][1] = "12"
-  #-----------State 9-----------------
-  actionTable[9][13][0] = "D"
-  actionTable[9][13][1] = "13"
-  #-----------State 10----------------
-  actionTable[10][13][0] = "R"
-  actionTable[10][13][1] = "7"
-  #-----------State 11----------------
-  actionTable[11][69][0] = "D"
-  actionTable[11][69][1] = "16"
-  
-  actionTable[11][2][0] = "D"
-  actionTable[11][2][1] = "15"
-  #-----------State 12----------------
-  actionTable[12][69][0] = "D"
-  actionTable[12][69][1] = "19"
-  
-  actionTable[12][67][0] = "D"
-  actionTable[12][67][1] = "11"
-    #-----------State 13----------------
-  actionTable[13][69][0] = "R"
-  actionTable[13][69][1] = "6"
-
-  actionTable[13][48][0] = "R"
-  actionTable[13][48][1] = "6"
-  
-  actionTable[13][67][0] = "R"
-  actionTable[13][67][1] = "6"
-
-  actionTable[13][68][0] = "R"
-  actionTable[13][68][1] = "6"
-  
-  #-----------State 14-----------------
-  actionTable[14][13][0] = "R"
-  actionTable[14][13][1] = "8"
-
-  actionTable[14][4][0] = "R"
-  actionTable[14][4][1] = "8"
-
-  #-----------State 15-----------------
-  actionTable[15][67][0] = "D"
-  actionTable[15][67][1] = "20"
-
-  #-----------State 16-----------------
-  actionTable[16][13][0] = "R"
-  actionTable[16][13][1] = "10"
-
-  actionTable[16][4][0] = "R"
-  actionTable[16][4][1] = "10"
-
-  #-----------State 17-----------------
-  actionTable[17][4][0] = "D"
-  actionTable[17][4][1] = "21"
-
-  #-----------State 18-----------------
-  actionTable[18][4][0] = "R"
-  actionTable[18][4][1] = "12"
-
-  #-----------State 19-----------------
-  actionTable[19][4][0] = "R"
-  actionTable[19][4][1] = "13"
-
-  #-----------State 20-----------------
-  actionTable[20][69][0] = "D"
-  actionTable[20][69][1] = "16"
-
-  actionTable[20][2][0] = "D"
-  actionTable[20][2][1] = "15"
-
-  #-----------State 21-----------------
-  actionTable[21][7][0] = "D"
-  actionTable[21][7][1] = "23"
-
-  #-----------State 22-----------------
-  actionTable[22][13][0] = "R"
-  actionTable[22][13][1] = "9"
-
-  actionTable[22][4][0] = "R"
-  actionTable[22][4][1] = "9"
-  
-  #-----------State 23-----------------
-  actionTable[23][69][0] = "D"
-  actionTable[23][69][1] = "25"
-
-  #-----------State 24-----------------
-  actionTable[24][69][0] = "D"
-  actionTable[24][69][1] = "28"
-
-  actionTable[24][48][0] = "D"
-  actionTable[24][48][1] = "7"
-
-  #-----------State 25-----------------
-  actionTable[25][69][0] = "R"
-  actionTable[25][69][1] = "15"
-
-  actionTable[25][48][0] = "R"
-  actionTable[25][48][1] = "15"
-
-  #-----------State 26-----------------
-  actionTable[26][13][0] = "D"
-  actionTable[26][13][1] = "48"
-
-  actionTable[26][67][0] = "D"
-  actionTable[26][67][1] = "40"
-
-  actionTable[26][8][0] = "D"
-  actionTable[26][8][1] = "29"
-
-  actionTable[26][49][0] = "D"
-  actionTable[26][49][1] = "41"
-
-  actionTable[26][50][0] = "D"
-  actionTable[26][50][1] = "42"
-
-  actionTable[26][51][0] = "D"
-  actionTable[26][51][1] = "44"
-
-  actionTable[26][54][0] = "D"
-  actionTable[26][54][1] = "45"
-
-  actionTable[26][38][0] = "D"
-  actionTable[26][38][1] = "46"
-
-  actionTable[26][57][0] = "D"
-  actionTable[26][57][1] = "47"
-
-  #-----------State 27-----------------
-  actionTable[27][69][0] = "R"
-  actionTable[27][69][1] = "14"
-
-  actionTable[27][48][0] = "R"
-  actionTable[27][48][1] = "14"
-
-  #-----------State 28-----------------
-  actionTable[28][13][0] = "R"
-  actionTable[28][13][1] = "17"
-
-  actionTable[28][67][0] = "R"
-  actionTable[28][67][1] = "17"
-
-  actionTable[28][8][0] = "R"
-  actionTable[26][8][1] = "17"
-
-  actionTable[28][49][0] = "R"
-  actionTable[28][49][1] = "17"
-
-  actionTable[28][50][0] = "R"
-  actionTable[28][50][1] = "17"
-
-  actionTable[28][51][0] = "R"
-  actionTable[28][51][1] = "17"
-
-  actionTable[28][54][0] = "R"
-  actionTable[28][54][1] = "17"
-
-  actionTable[28][38][0] = "R"
-  actionTable[28][38][1] = "17"
-
-  actionTable[28][57][0] = "R"
-  actionTable[28][57][1] = "17"
-
-  #-----------State 29----------------
-  actionTable[29][48][0] = "R"
-  actionTable[29][48][1] = "11"
-  
-  actionTable[29][67][0] = "R"
-  actionTable[29][67][1] = "11"
-
-  actionTable[20][68][0] = "R"
-  actionTable[29][68][1] = "11"
-
-  #-----------State 30-----------------
-  actionTable[30][13][0] = "R"
-  actionTable[30][13][1] = "16"
-
-  actionTable[30][67][0] = "R"
-  actionTable[30][67][1] = "16"
-
-  actionTable[30][8][0] = "R"
-  actionTable[30][8][1] = "16"
-
-  actionTable[30][49][0] = "R"
-  actionTable[30][49][1] = "16"
-
-  actionTable[30][50][0] = "R"
-  actionTable[30][50][1] = "16"
-
-  actionTable[30][51][0] = "R"
-  actionTable[30][51][1] = "16"
-
-  actionTable[30][54][0] = "R"
-  actionTable[30][54][1] = "16"
-
-  actionTable[30][38][0] = "R"
-  actionTable[30][38][1] = "16"
-
-  actionTable[30][57][0] = "R"
-  actionTable[30][57][1] = "16"
-
-    #-----------State 31-----------------
-  actionTable[31][13][0] = "R"
-  actionTable[31][13][1] = "18"
-
-  actionTable[31][67][0] = "R"
-  actionTable[31][67][1] = "18"
-
-  actionTable[31][8][0] = "R"
-  actionTable[31][8][1] = "18"
-
-  actionTable[31][49][0] = "R"
-  actionTable[31][49][1] = "18"
-
-  actionTable[31][50][0] = "R"
-  actionTable[31][50][1] = "18"
-
-  actionTable[31][51][0] = "R"
-  actionTable[31][51][1] = "18"
-
-  actionTable[31][54][0] = "R"
-  actionTable[31][54][1] = "18"
-
-  actionTable[31][38][0] = "R"
-  actionTable[31][38][1] = "18"
-
-  actionTable[31][57][0] = "R"
-  actionTable[31][57][1] = "18"
-
-  #-----------State 32-----------------
-  actionTable[32][13][0] = "R"
-  actionTable[32][13][1] = "19"
-
-  actionTable[32][67][0] = "R"
-  actionTable[32][67][1] = "19"
-
-  actionTable[32][8][0] = "R"
-  actionTable[32][8][1] = "19"
-
-  actionTable[32][49][0] = "R"
-  actionTable[32][49][1] = "19"
-
-  actionTable[32][50][0] = "R"
-  actionTable[32][50][1] = "19"
-
-  actionTable[32][51][0] = "R"
-  actionTable[32][51][1] = "19"
-
-  actionTable[32][54][0] = "R"
-  actionTable[32][54][1] = "19"
-
-  actionTable[32][38][0] = "R"
-  actionTable[32][38][1] = "19"
-
-  actionTable[32][57][0] = "R"
-  actionTable[32][57][1] = "19"
-
-  #-----------State 33-----------------
-  actionTable[33][13][0] = "R"
-  actionTable[33][13][1] = "20"
-
-  actionTable[33][67][0] = "R"
-  actionTable[33][67][1] = "20"
-
-  actionTable[33][8][0] = "R"
-  actionTable[33][8][1] = "20"
-
-  actionTable[33][49][0] = "R"
-  actionTable[33][49][1] = "20"
-
-  actionTable[33][50][0] = "R"
-  actionTable[33][50][1] = "20"
-
-  actionTable[33][51][0] = "R"
-  actionTable[33][51][1] = "20"
-
-  actionTable[33][54][0] = "R"
-  actionTable[33][54][1] = "20"
-
-  actionTable[33][38][0] = "R"
-  actionTable[33][38][1] = "20"
-
-  actionTable[33][57][0] = "R"
-  actionTable[33][57][1] = "20"  
-
-  #-----------State 34-----------------
-  actionTable[34][13][0] = "R"
-  actionTable[34][13][1] = "21"
-
-  actionTable[34][67][0] = "R"
-  actionTable[34][67][1] = "21"
-
-  actionTable[34][8][0] = "R"
-  actionTable[34][8][1] = "21"
-
-  actionTable[34][49][0] = "R"
-  actionTable[34][49][1] = "21"
-
-  actionTable[34][50][0] = "R"
-  actionTable[34][50][1] = "21"
-
-  actionTable[34][51][0] = "R"
-  actionTable[34][51][1] = "21"
-
-  actionTable[34][54][0] = "R"
-  actionTable[34][54][1] = "21"
-
-  actionTable[34][38][0] = "R"
-  actionTable[34][38][1] = "21"
-
-  actionTable[34][57][0] = "R"
-  actionTable[34][57][1] = "21"  
-
-  #-----------State 35-----------------
-  actionTable[35][13][0] = "R"
-  actionTable[35][13][1] = "22"
-
-  actionTable[35][67][0] = "R"
-  actionTable[35][67][1] = "22"
-
-  actionTable[35][8][0] = "R"
-  actionTable[35][8][1] = "22"
-
-  actionTable[35][49][0] = "R"
-  actionTable[35][49][1] = "22"
-
-  actionTable[35][50][0] = "R"
-  actionTable[35][50][1] = "22"
-
-  actionTable[35][51][0] = "R"
-  actionTable[35][51][1] = "22"
-
-  actionTable[35][54][0] = "R"
-  actionTable[35][54][1] = "22"
-
-  actionTable[35][38][0] = "R"
-  actionTable[35][38][1] = "22"
-
-  actionTable[35][57][0] = "R"
-  actionTable[35][57][1] = "22" 
-
-    #-----------State 36-----------------
-  actionTable[36][13][0] = "R"
-  actionTable[36][13][1] = "23"
-
-  actionTable[36][67][0] = "R"
-  actionTable[36][67][1] = "23"
-
-  actionTable[36][8][0] = "R"
-  actionTable[36][8][1] = "23"
-
-  actionTable[36][49][0] = "R"
-  actionTable[36][49][1] = "23"
-
-  actionTable[36][50][0] = "R"
-  actionTable[36][50][1] = "23"
-
-  actionTable[36][51][0] = "R"
-  actionTable[36][51][1] = "23"
-
-  actionTable[36][54][0] = "R"
-  actionTable[36][54][1] = "23"
-
-  actionTable[36][38][0] = "R"
-  actionTable[36][38][1] = "23"
-
-  actionTable[36][57][0] = "R"
-  actionTable[36][57][1] = "23" 
-
-  #-----------State 37-----------------
-  actionTable[37][13][0] = "R"
-  actionTable[37][13][1] = "24"
-
-  actionTable[37][67][0] = "R"
-  actionTable[37][67][1] = "24"
-
-  actionTable[37][8][0] = "R"
-  actionTable[37][8][1] = "24"
-
-  actionTable[37][49][0] = "R"
-  actionTable[37][49][1] = "24"
-
-  actionTable[37][50][0] = "R"
-  actionTable[37][50][1] = "24"
-
-  actionTable[37][51][0] = "R"
-  actionTable[37][51][1] = "24"
-
-  actionTable[37][54][0] = "R"
-  actionTable[37][54][1] = "24"
-
-  actionTable[37][38][0] = "R"
-  actionTable[37][38][1] = "24"
-
-  actionTable[37][57][0] = "R"
-  actionTable[37][57][1] = "24" 
-
-    #-----------State 38-----------------
-  actionTable[38][13][0] = "R"
-  actionTable[38][13][1] = "25"
-
-  actionTable[38][67][0] = "R"
-  actionTable[38][67][1] = "25"
-
-  actionTable[38][8][0] = "R"
-  actionTable[38][8][1] = "25"
-
-  actionTable[38][49][0] = "R"
-  actionTable[38][49][1] = "25"
-
-  actionTable[38][50][0] = "R"
-  actionTable[38][50][1] = "25"
-
-  actionTable[38][51][0] = "R"
-  actionTable[38][51][1] = "25"
-
-  actionTable[38][54][0] = "R"
-  actionTable[38][54][1] = "25"
-
-  actionTable[38][38][0] = "R"
-  actionTable[38][38][1] = "25"
-
-  actionTable[38][57][0] = "R"
-  actionTable[38][57][1] = "25" 
-
-  #-----------State 39-----------------
-  actionTable[39][13][0] = "R"
-  actionTable[39][13][1] = "26"
-
-  actionTable[39][67][0] = "R"
-  actionTable[39][67][1] = "26"
-
-  actionTable[39][8][0] = "R"
-  actionTable[39][8][1] = "26"
-
-  actionTable[39][49][0] = "R"
-  actionTable[39][49][1] = "26"
-
-  actionTable[39][50][0] = "R"
-  actionTable[39][50][1] = "26"
-
-  actionTable[39][51][0] = "R"
-  actionTable[39][51][1] = "26"
-
-  actionTable[39][54][0] = "R"
-  actionTable[39][54][1] = "26"
-
-  actionTable[39][38][0] = "R"
-  actionTable[39][38][1] = "26"
-
-  actionTable[39][57][0] = "R"
-  actionTable[39][57][1] = "26" 
-
-  #-----------State 40-----------------
-  actionTable[40][3][0] = "D"
-  actionTable[40][3][1] = "50"
-
-  actionTable[40][14][0] = "D"
-  actionTable[40][14][1] = "49"
-
-  #-----------State 41-----------------
-  actionTable[41][67][0] = "D"
-  actionTable[41][67][1] = "51"
-
-  #-----------State 42-----------------
-  actionTable[42][67][0] = "D"
-  actionTable[42][67][1] = "52"
-
-  #-----------State 43-----------------
-  actionTable[43][13][0] = "D"
-  actionTable[43][13][1] = "53"
-  
-  #-----------State 44-----------------
-  actionTable[44][3][0] = "D"
-  actionTable[44][3][1] = "54"
-
-  #-----------State 45-----------------
-  actionTable[45][7][0] = "D"
-  actionTable[45][7][1] = "55"
-
-  #-----------State 46-----------------
-  actionTable[46][13][0] = "D"
-  actionTable[46][13][1] = "56"
-
-  #-----------State 46-----------------
-  actionTable[46][13][0] = "D"
-  actionTable[46][13][1] = "56"
-
-  #-----------State 47-----------------
-  actionTable[47][67][0] = "D"
-  actionTable[47][67][1] = "70"
-
-  actionTable[47][3][0] = "D"
-  actionTable[47][3][1] = "74"
-
-  actionTable[47][1][0] = "D"
-  actionTable[47][1][1] = "67"
-
-  actionTable[47][39][0] = "D"
-  actionTable[47][39][1] = "68"
-
-  actionTable[47][61][0] = "D"
-  actionTable[47][61][1] = "69"
-
-  actionTable[47][5][0] = "D"
-  actionTable[47][5][1] = "75"
-
-  actionTable[47][65][0] = "D"
-  actionTable[47][65][1] = "76"
-
-  actionTable[47][64][0] = "D"
-  actionTable[47][64][1] = "77"
-
-  actionTable[47][66][0] = "D"
-  actionTable[47][66][1] = "78" 
-
-  actionTable[47][63][0] = "D"
-  actionTable[47][63][1] = "79" 
-
-    #-----------State 48-----------------
-  actionTable[48][13][0] = "R"
-  actionTable[48][13][1] = "44"
-
-  actionTable[48][67][0] = "R"
-  actionTable[48][67][1] = "44"
-
-  actionTable[48][7][0] = "R"
-  actionTable[48][7][1] = "44"
-
-  actionTable[48][49][0] = "R"
-  actionTable[48][49][1] = "44"
-
-  actionTable[48][50][0] = "R"
-  actionTable[48][50][1] = "44"
-
-  actionTable[48][51][0] = "R"
-  actionTable[48][51][1] = "44"
-
-  actionTable[48][54][0] = "R"
-  actionTable[48][54][1] = "44"
-
-  actionTable[48][38][0] = "R"
-  actionTable[48][38][1] = "44"
-
-  actionTable[48][57][0] = "R"
-  actionTable[48][57][1] = "44" 
-
-  #-----------State 49-----------------
-  actionTable[49][67][0] = "D"
-  actionTable[49][67][1] = "70"
-
-  actionTable[49][3][0] = "D"
-  actionTable[49][3][1] = "74"
-
-  actionTable[49][1][0] = "D"
-  actionTable[49][1][1] = "67"
-
-  actionTable[49][39][0] = "D"
-  actionTable[49][39][1] = "68"
-
-  actionTable[49][61][0] = "D"
-  actionTable[49][61][1] = "69"
-
-  actionTable[49][5][0] = "D"
-  actionTable[49][5][1] = "75"
-
-  actionTable[49][65][0] = "D"
-  actionTable[49][65][1] = "76"
-
-  actionTable[49][64][0] = "D"
-  actionTable[49][64][1] = "77"
-
-  actionTable[49][66][0] = "D"
-  actionTable[49][66][1] = "78" 
-
-  actionTable[49][63][0] = "D"
-  actionTable[49][63][1] = "79" 
-
-  #-----------State 50-----------------
-  actionTable[50][69][0] = "D"
-  actionTable[50][69][1] = "83"
-  
-  actionTable[50][67][0] = "D"
-  actionTable[50][67][1] = "70"
-
-  actionTable[50][3][0] = "D"
-  actionTable[50][3][1] = "74"
-
-  actionTable[50][1][0] = "D"
-  actionTable[50][1][1] = "67"
-
-  actionTable[50][39][0] = "D"
-  actionTable[50][39][1] = "68"
-
-  actionTable[50][61][0] = "D"
-  actionTable[50][61][1] = "69"
-
-  actionTable[50][5][0] = "D"
-  actionTable[50][5][1] = "75"
-
-  actionTable[50][65][0] = "D"
-  actionTable[50][65][1] = "76"
-
-  actionTable[50][64][0] = "D"
-  actionTable[50][64][1] = "77"
-
-  actionTable[50][66][0] = "D"
-  actionTable[50][66][1] = "78" 
-
-  actionTable[50][63][0] = "D"
-  actionTable[50][63][1] = "79" 
-
-  #-----------State 51-----------------
-  actionTable[51][13][0] = "D"
-  actionTable[51][13][1] = "84"
-
-  #-----------State 52-----------------
-  actionTable[52][13][0] = "D"
-  actionTable[52][13][1] = "85"
-
-    #-----------State 53-----------------
-  actionTable[53][13][0] = "R"
-  actionTable[53][13][1] = "30"
-
-  actionTable[53][67][0] = "R"
-  actionTable[53][67][1] = "30"
-
-  actionTable[53][7][0] = "R"
-  actionTable[53][7][1] = "30"
-
-  actionTable[53][49][0] = "R"
-  actionTable[53][49][1] = "30"
-
-  actionTable[53][50][0] = "R"
-  actionTable[53][50][1] = "30"
-
-  actionTable[53][51][0] = "R"
-  actionTable[53][51][1] = "30"
-
-  actionTable[53][54][0] = "R"
-  actionTable[53][54][1] = "30"
-
-  actionTable[53][38][0] = "R"
-  actionTable[53][38][1] = "30"
-
-  actionTable[53][57][0] = "R"
-  actionTable[53][57][1] = "30" 
-
-  #-----------State 54-----------------
-  actionTable[54][67][0] = "D"
-  actionTable[54][67][1] = "70"
-
-  actionTable[54][3][0] = "D"
-  actionTable[54][3][1] = "74"
-
-  actionTable[54][1][0] = "D"
-  actionTable[54][1][1] = "67"
-
-  actionTable[54][39][0] = "D"
-  actionTable[54][39][1] = "68"
-
-  actionTable[54][61][0] = "D"
-  actionTable[54][61][1] = "69"
-
-  actionTable[54][5][0] = "D"
-  actionTable[54][5][1] = "75"
-
-  actionTable[54][65][0] = "D"
-  actionTable[54][65][1] = "76"
-
-  actionTable[54][64][0] = "D"
-  actionTable[54][64][1] = "77"
-
-  actionTable[54][66][0] = "D"
-  actionTable[54][66][1] = "78" 
-
-  actionTable[54][63][0] = "D"
-  actionTable[54][63][1] = "79" 
-
-  #-----------State 55-----------------
-  actionTable[55][69][0] = "D"
-  actionTable[55][69][1] = "28"
-
-  #-----------State 56-----------------
-  actionTable[56][13][0] = "R"
-  actionTable[56][13][1] = "42"
-
-  actionTable[56][67][0] = "R"
-  actionTable[56][67][1] = "42"
-
-  actionTable[56][7][0] = "R"
-  actionTable[56][7][1] = "42"
-
-  actionTable[56][49][0] = "R"
-  actionTable[56][49][1] = "42"
-
-  actionTable[56][50][0] = "R"
-  actionTable[56][50][1] = "42"
-
-  actionTable[56][51][0] = "R"
-  actionTable[56][51][1] = "42"
-
-  actionTable[56][54][0] = "R"
-  actionTable[56][54][1] = "42"
-
-  actionTable[56][38][0] = "R"
-  actionTable[56][38][1] = "42"
-
-  actionTable[56][57][0] = "R"
-  actionTable[56][57][1] = "42" 
-
-  #-----------State 57-----------------
-  actionTable[57][13][0] = "D"
-  actionTable[57][13][1] = "88"
-
-   #-----------State 58-----------------
-  actionTable[58][69][0] = "R"
-  actionTable[58][69][1] = "45"
-
-  actionTable[58][13][0] = "R"
-  actionTable[58][13][1] = "45"
-
-  actionTable[58][2][0] = "R"
-  actionTable[58][2][1] = "45"
-
-  actionTable[58][4][0] = "R"
-  actionTable[58][4][1] = "45"
-
-  actionTable[58][41][0] = "D"
-  actionTable[58][41][1] = "89"
-
-   #-----------State 59-----------------
-  actionTable[59][69][0] = "R"
-  actionTable[59][69][1] = "47"
-
-  actionTable[59][13][0] = "R"
-  actionTable[59][13][1] = "47"
-
-  actionTable[59][2][0] = "R"
-  actionTable[59][2][1] = "47"
-
-  actionTable[59][4][0] = "R"
-  actionTable[59][4][1] = "47"
-
-  actionTable[59][41][0] = "R"
-  actionTable[59][41][1] = "47"
-  
-  actionTable[59][40][0] = "D"
-  actionTable[59][40][1] = "90"
-
-   #-----------State 60-----------------
-  actionTable[60][69][0] = "R"
-  actionTable[60][69][1] = "49"
-
-  actionTable[60][13][0] = "R"
-  actionTable[60][13][1] = "49"
-
-  actionTable[60][2][0] = "R"
-  actionTable[60][2][1] = "49"
-
-  actionTable[60][4][0] = "R"
-  actionTable[60][4][1] = "49"
-
-  actionTable[60][41][0] = "R"
-  actionTable[60][41][1] = "49"
-  
-  actionTable[60][40][0] = "R"
-  actionTable[60][40][1] = "49"
-
-  actionTable[60][25][0] = "D"
-  actionTable[60][25][1] = "92"
-  
-  actionTable[60][24][0] = "D"
-  actionTable[60][24][1] = "93"
-
-   #-----------State 61-----------------
-  actionTable[61][69][0] = "R"
-  actionTable[61][69][1] = "51"
-
-  actionTable[61][13][0] = "R"
-  actionTable[61][13][1] = "51"
-
-  actionTable[61][2][0] = "R"
-  actionTable[61][2][1] = "51"
-
-  actionTable[61][4][0] = "R"
-  actionTable[61][4][1] = "51"
-
-  actionTable[61][41][0] = "R"
-  actionTable[61][41][1] = "51"
-  
-  actionTable[61][40][0] = "R"
-  actionTable[61][40][1] = "51"
-
-  actionTable[61][25][0] = "R"
-  actionTable[61][25][1] = "51"
-  
-  actionTable[61][24][0] = "R"
-  actionTable[61][24][1] = "51"
-
-  actionTable[61][20][0] = "D"
-  actionTable[61][20][1] = "95"
-  
-  actionTable[61][22][0] = "D"
-  actionTable[61][22][1] = "96"
-
-  actionTable[61][21][0] = "D"
-  actionTable[61][21][1] = "97"
-  
-  actionTable[61][23][0] = "D"
-  actionTable[61][23][1] = "98"
-
-   #-----------State 62-----------------
-  actionTable[62][69][0] = "R"
-  actionTable[62][69][1] = "55"
-
-  actionTable[62][13][0] = "R"
-  actionTable[62][13][1] = "55"
-
-  actionTable[62][2][0] = "R"
-  actionTable[62][2][1] = "55"
-
-  actionTable[62][4][0] = "R"
-  actionTable[62][4][1] = "55"
-
-  actionTable[62][41][0] = "R"
-  actionTable[62][41][1] = "55"
-  
-  actionTable[62][40][0] = "R"
-  actionTable[62][40][1] = "55"
-
-  actionTable[62][25][0] = "R"
-  actionTable[62][25][1] = "55"
-  
-  actionTable[62][24][0] = "R"
-  actionTable[62][24][1] = "55"
-
-  actionTable[62][20][0] = "R"
-  actionTable[62][20][1] = "55"
-  
-  actionTable[62][22][0] = "R"
-  actionTable[62][22][1] = "55"
-
-  actionTable[62][21][0] = "R"
-  actionTable[62][21][1] = "55"
-  
-  actionTable[62][23][0] = "R"
-  actionTable[62][23][1] = "55"
-
-  actionTable[62][1][0] = "D"
-  actionTable[62][1][1] = "100"
-  
-  actionTable[62][39][0] = "D"
-  actionTable[62][39][1] = "101"
-
- #-----------State 63-----------------
-  actionTable[63][69][0] = "R"
-  actionTable[63][69][1] = "61"
-
-  actionTable[63][13][0] = "R"
-  actionTable[63][13][1] = "61"
-
-  actionTable[63][2][0] = "R"
-  actionTable[63][2][1] = "61"
-
-  actionTable[63][4][0] = "R"
-  actionTable[63][4][1] = "61"
-
-  actionTable[63][41][0] = "R"
-  actionTable[63][41][1] = "61"
-  
-  actionTable[63][40][0] = "R"
-  actionTable[63][40][1] = "61"
-
-  actionTable[63][25][0] = "R"
-  actionTable[63][25][1] = "61"
-  
-  actionTable[63][24][0] = "R"
-  actionTable[63][24][1] = "61"
-
-  actionTable[63][20][0] = "R"
-  actionTable[63][20][1] = "61"
-  
-  actionTable[63][22][0] = "R"
-  actionTable[63][22][1] = "61"
-
-  actionTable[63][21][0] = "R"
-  actionTable[63][21][1] = "61"
-  
-  actionTable[63][23][0] = "R"
-  actionTable[63][23][1] = "61"
-
-  actionTable[63][1][0] = "R"
-  actionTable[63][1][1] = "61"
-  
-  actionTable[63][39][0] = "R"
-  actionTable[63][39][1] = "61"
-
-  actionTable[63][9][0] = "D"
-  actionTable[63][9][1] = "103"
-
-  actionTable[63][11][0] = "D"
-  actionTable[63][11][1] = "104"
-  
-  actionTable[63][10][0] = "D"
-  actionTable[63][10][1] = "104"
-
- #-----------State 64-----------------
-  actionTable[64][69][0] = "R"
-  actionTable[64][69][1] = "65"
-
-  actionTable[64][13][0] = "R"
-  actionTable[64][13][1] = "65"
-
-  actionTable[64][2][0] = "R"
-  actionTable[64][2][1] = "65"
-
-  actionTable[64][4][0] = "R"
-  actionTable[64][4][1] = "65"
-
-  actionTable[64][41][0] = "R"
-  actionTable[64][41][1] = "65"
-  
-  actionTable[64][40][0] = "R"
-  actionTable[64][40][1] = "65"
-
-  actionTable[64][25][0] = "R"
-  actionTable[64][25][1] = "65"
-  
-  actionTable[64][24][0] = "R"
-  actionTable[64][24][1] = "65"
-
-  actionTable[64][20][0] = "R"
-  actionTable[64][20][1] = "65"
-  
-  actionTable[64][22][0] = "R"
-  actionTable[64][22][1] = "65"
-
-  actionTable[64][21][0] = "R"
-  actionTable[64][21][1] = "65"
-  
-  actionTable[64][23][0] = "R"
-  actionTable[64][23][1] = "65"
-
-  actionTable[64][1][0] = "R"
-  actionTable[64][1][1] = "65"
-  
-  actionTable[64][39][0] = "R"
-  actionTable[64][39][1] = "65"
-
-  actionTable[64][9][0] = "R"
-  actionTable[64][9][1] = "65"
-
-  actionTable[64][11][0] = "R"
-  actionTable[64][11][1] = "65"
-  
-  actionTable[64][10][0] = "R"
-  actionTable[64][10][1] = "65"
-
-  #-----------State 65-----------------
-  actionTable[65][67][0] = "D"
-  actionTable[65][67][1] = "70"
-
-  actionTable[65][3][0] = "D"
-  actionTable[65][3][1] = "74"
-
-  actionTable[65][1][0] = "D"
-  actionTable[65][1][1] = "67"
-
-  actionTable[65][39][0] = "D"
-  actionTable[65][39][1] = "68"
-
-  actionTable[65][61][0] = "D"
-  actionTable[65][61][1] = "69"
-
-  actionTable[65][5][0] = "D"
-  actionTable[65][5][1] = "75"
-
-  actionTable[65][65][0] = "D"
-  actionTable[65][65][1] = "76"
-
-  actionTable[65][64][0] = "D"
-  actionTable[65][64][1] = "77"
-
-  actionTable[65][66][0] = "D"
-  actionTable[65][66][1] = "78" 
-
-  actionTable[65][63][0] = "D"
-  actionTable[65][63][1] = "79" 
-
-  #-----------State 66-----------------
-  actionTable[66][69][0]= "R"
-  actionTable[66][69][0]= "70"
-  
-  actionTable[66][13][0]="R"
-  actionTable[66][13][1]="70"
-
-  actionTable[66][2][0]="R"
-  actionTable[66][2][1]="70"
-
-  actionTable[66][4][0]="R"
-  actionTable[66][4][1]="70"
-
-  actionTable[66][41][0]="R"
-  actionTable[66][41][1]="70"
-  
-  actionTable[66][40][0]="R"
-  actionTable[66][40][1]="70"
-  
-  actionTable[66][25][0]="R"
-  actionTable[66][25][1]="70"
-
-  actionTable[66][24][0]="R"
-  actionTable[66][24][1]="70"
-
-  actionTable[66][20][0]="R"
-  actionTable[66][20][1]="70"
-
-  actionTable[66][22][0]="R"
-  actionTable[66][22][1]="70"
-
-  actionTable[66][21][0]="R"
-  actionTable[66][21][1]="70"
-
-  actionTable[66][23][0]="R"
-  actionTable[66][23][1]="70"
-
-  actionTable[66][1][0]="R"
-  actionTable[66][1][1]="70"
-
-  actionTable[66][39][0]="R"
-  actionTable[66][39][1]="70"
-
-  actionTable[66][9][0]="R"
-  actionTable[66][9][1]="70"
-
-  actionTable[66][11][0]="R"
-  actionTable[66][11][1]="70"
-
-  actionTable[66][10][0]="R"
-  actionTable[66][10][1]="70"
-  #-----------State 67-----------------
-  actionTable[67][67][0]="R"
-  actionTable[67][67][1]="71"
-
-  actionTable[67][3][0]="R"
-  actionTable[67][3][1]="71"
-
-  actionTable[67][1][0]="R"
-  actionTable[67][1][1]="71"
-
-  actionTable[67][39][0]="R"
-  actionTable[67][39][1]="71"
-
-  actionTable[67][61][0]="R"
-  actionTable[67][61][1]="71"
-
-  actionTable[67][5][0]="R"
-  actionTable[67][5][1]="71"
-
-  actionTable[67][65][0]="R"
-  actionTable[67][65][1]="71"
-
-  actionTable[67][64][0]="R"
-  actionTable[67][64][1]="71"
-
-  actionTable[67][66][0]="R"
-  actionTable[67][66][1]="71"
-
-  actionTable[67][63][0]="R"
-  actionTable[67][63][1]="71"
-  
-  #-----------State 68-----------------
-  actionTable[68][67][0]="R"
-  actionTable[68][67][1]="72"
-
-  actionTable[68][3][0]="R"
-  actionTable[68][3][1]="72"
-
-  actionTable[68][1][0]="R"
-  actionTable[68][1][1]="72"
-  
-  actionTable[68][39][0]="R"
-  actionTable[68][39][1]="72"
-
-  actionTable[68][61][0]="R"
-  actionTable[68][61][1]="72"
-
-  actionTable[68][5][0]="R"
-  actionTable[68][5][1]="72"
-
-  actionTable[68][65][0]="R"
-  actionTable[68][65][1]="72"
-
-  actionTable[68][64][0]="R"
-  actionTable[68][64][1]="72"
-
-  actionTable[68][66][0]="R"
-  actionTable[68][66][1]="72"
-
-  actionTable[68][63][0]="R"
-  actionTable[68][63][1]="72"
-  
-  #-----------State 69-----------------
-  actionTable[69][67][0]="R"
-  actionTable[69][67][1]="73"
-
-  actionTable[69][3][0]="R"
-  actionTable[69][3][1]="73"
-
-  actionTable[69][1][0]="R"
-  actionTable[69][1][1]="73"
-
-  actionTable[69][39][0]="R"
-  actionTable[69][39][1]="73"
-
-  actionTable[69][61][0]="R"
-  actionTable[69][61][1]="73"
-
-  actionTable[69][5][0]="R"
-  actionTable[69][5][1]="73"
-
-  actionTable[69][65][0]="R"
-  actionTable[69][65][1]="73"
-
-  actionTable[69][64][0]="R"
-  actionTable[69][64][1]="73"
-
-  actionTable[69][66][0]="R"
-  actionTable[69][66][1]="73"
-
-  actionTable[69][63][0]="R"
-  actionTable[69][63][1]="73"
-
-  #-----------State 70-----------------
-  actionTable[70][69][0]="R"
-  actionTable[70][69][1]="74"
-
-  actionTable[70][13][0]="R"
-  actionTable[70][13][1]="74"
-
-  actionTable[70][2][0]="R"
-  actionTable[70][2][1]="74"
-
-  actionTable[70][3][0]="D"
-  actionTable[70][3][1]="50"
-  
-  actionTable[70][4][0]="R"
-  actionTable[70][4][1]="74"
-
-  actionTable[70][41][0]="R"
-  actionTable[70][41][1]="74"
-
-  actionTable[70][40][0]="R"
-  actionTable[70][40][1]="74"
-
-  actionTable[70][25][0]="R"
-  actionTable[70][25][1]="74"
-
-  actionTable[70][24][0]="R"
-  actionTable[70][24][1]="74"
-  
-  actionTable[70][20][0]="R"
-  actionTable[70][20][1]="74"
-
-  actionTable[70][22][0]="R"
-  actionTable[70][22][1]="74"
-
-  actionTable[70][21][0]="R"
-  actionTable[70][21][1]="74"
-
-  actionTable[70][23][0]="R"
-  actionTable[70][23][1]="74"
-
-  actionTable[70][1][0]="R"
-  actionTable[70][1][1]="74"
-
-  actionTable[70][39][0]="R"
-  actionTable[70][39][1]="74"
-
-  actionTable[70][9][0]="R"
-  actionTable[70][9][1]="74"
-
-  actionTable[70][11][0]="R"
-  actionTable[70][11][1]="74"
-
-  actionTable[70][10][0]="R"
-  actionTable[70][10][1]="74"
-
-  #-----------State 71-----------------
-  actionTable[71][69][0]="R"
-  actionTable[71][69][1]="75"
-
-  actionTable[71][13][0]="R"
-  actionTable[71][13][1]="75"
-
-  actionTable[71][2][0]="R"
-  actionTable[71][2][1]="75"
-  
-  actionTable[71][4][0]="R"
-  actionTable[71][4][1]="75"
-
-  actionTable[71][41][0]="R"
-  actionTable[71][41][1]="75"
-
-  actionTable[71][40][0]="R"
-  actionTable[71][40][1]="75"
-
-  actionTable[71][25][0]="R"
-  actionTable[71][25][1]="75"
-
-  actionTable[71][24][0]="R"
-  actionTable[71][24][1]="75"
-  
-  actionTable[71][20][0]="R"
-  actionTable[71][20][1]="75"
-
-  actionTable[71][22][0]="R"
-  actionTable[71][22][1]="75"
-
-  actionTable[71][21][0]="R"
-  actionTable[71][21][1]="74"
-
-  actionTable[71][23][0]="R"
-  actionTable[71][23][1]="75"
-
-  actionTable[71][1][0]="R"
-  actionTable[71][1][1]="75"
-
-  actionTable[71][39][0]="R"
-  actionTable[71][39][1]="75"
-
-  actionTable[71][9][0]="R"
-  actionTable[71][9][1]="75"
-
-  actionTable[71][11][0]="R"
-  actionTable[71][11][1]="75"
-
-  actionTable[71][10][0]="R"
-  actionTable[71][10][1]="75"
-
-  #-----------State 72-----------------
-  actionTable[72][69][0]="R"
-  actionTable[72][69][1]="76"
-
-  actionTable[72][13][0]="R"
-  actionTable[72][13][1]="76"
-
-  actionTable[72][2][0]="R"
-  actionTable[72][2][1]="76"
-  
-  actionTable[72][4][0]="R"
-  actionTable[72][4][1]="76"
-
-  actionTable[72][41][0]="R"
-  actionTable[72][41][1]="76"
-
-  actionTable[72][40][0]="R"
-  actionTable[72][40][1]="76"
-
-  actionTable[72][25][0]="R"
-  actionTable[72][25][1]="76"
-
-  actionTable[72][24][0]="R"
-  actionTable[72][24][1]="76"
-  
-  actionTable[72][20][0]="R"
-  actionTable[72][20][1]="76"
-
-  actionTable[72][22][0]="R"
-  actionTable[72][22][1]="76"
-
-  actionTable[72][21][0]="R"
-  actionTable[72][21][1]="76"
-
-  actionTable[72][23][0]="R"
-  actionTable[72][23][1]="76"
-
-  actionTable[72][1][0]="R"
-  actionTable[72][1][1]="76"
-
-  actionTable[72][39][0]="R"
-  actionTable[72][39][1]="76"
-
-  actionTable[72][9][0]="R"
-  actionTable[72][9][1]="76"
-
-  actionTable[72][11][0]="R"
-  actionTable[72][11][1]="76"
-
-  actionTable[72][10][0]="R"
-  actionTable[72][10][1]="76"
-
-  #-----------State 73-----------------
-  actionTable[73][69][0]="R"
-  actionTable[73][69][1]="77"
-
-  actionTable[73][13][0]="R"
-  actionTable[73][13][1]="77"
-
-  actionTable[73][2][0]="R"
-  actionTable[73][2][1]="77"
-  
-  actionTable[73][4][0]="R"
-  actionTable[73][4][1]="77"
-
-  actionTable[73][41][0]="R"
-  actionTable[73][41][1]="77"
-
-  actionTable[73][40][0]="R"
-  actionTable[73][40][1]="77"
-
-  actionTable[73][25][0]="R"
-  actionTable[73][25][1]="77"
-
-  actionTable[73][24][0]="R"
-  actionTable[73][24][1]="77"
-  
-  actionTable[73][20][0]="R"
-  actionTable[73][20][1]="77"
-
-  actionTable[73][22][0]="R"
-  actionTable[73][22][1]="77"
-
-  actionTable[73][21][0]="R"
-  actionTable[73][21][1]="77"
-
-  actionTable[73][23][0]="R"
-  actionTable[73][23][1]="77"
-
-  actionTable[73][1][0]="R"
-  actionTable[73][1][1]="77"
-
-  actionTable[73][39][0]="R"
-  actionTable[73][39][1]="77"
-
-  actionTable[73][9][0]="R"
-  actionTable[73][9][1]="77"
-
-  actionTable[73][11][0]="R"
-  actionTable[73][11][1]="77"
-
-  actionTable[73][10][0]="R"
-  actionTable[73][10][1]="77"
-
-  #-----------State 74-----------------
-  actionTable[74][67][0]="D"
-  actionTable[74][67][1]="70"
-
-  actionTable[74][3][0]="D"
-  actionTable[74][3][1]="74"
-
-  actionTable[74][1][0]="D"
-  actionTable[74][1][1]="67"
-
-  actionTable[74][39][0]="D"
-  actionTable[74][39][1]="68"
-
-  actionTable[74][61][0]="D"
-  actionTable[74][61][1]="69"
-
-  actionTable[74][5][0]="D"
-  actionTable[74][5][1]="75"
-
-  actionTable[74][65][0]="D"
-  actionTable[74][65][1]="76"
-
-  actionTable[74][64][0]="D"
-  actionTable[74][64][1]="77"
-
-  actionTable[74][66][0]="D"
-  actionTable[74][66][1]="78"
-
-  actionTable[74][63][0]="D"
-  actionTable[74][63][1]="79"
-
-  #-----------State 75-----------------
-  actionTable[75][69][0]="D"
-  actionTable[75][69][1]="83"
-
-  actionTable[75][67][0]="D"
-  actionTable[75][67][1]="70"
-
-  actionTable[75][3][0]="D"
-  actionTable[75][3][1]="74"
-
-  actionTable[75][1][0]="D"
-  actionTable[75][1][1]="67"
-
-  actionTable[75][39][0]="D"
-  actionTable[75][39][1]="68"
-
-  actionTable[75][61][0]="D"
-  actionTable[75][61][1]="69"
-
-  actionTable[75][5][0]="D"
-  actionTable[75][5][1]="75"
-
-  actionTable[75][65][0]="D"
-  actionTable[75][65][1]="76"
-
-  actionTable[75][64][0]="D"
-  actionTable[75][64][1]="77"
-
-  actionTable[75][66][0]="D"
-  actionTable[75][66][1]="78"
-
-  actionTable[75][63][0]="D"
-  actionTable[75][63][1]="79"
-
-  #-----------State 76-----------------
-  actionTable[76][69][0]="R"
-  actionTable[76][69][1]="80"
-
-  actionTable[76][13][0]="R"
-  actionTable[76][13][1]="80"
-
-  actionTable[76][2][0]="R"
-  actionTable[76][2][1]="80"
-
-  actionTable[76][4][0]="R"
-  actionTable[76][4][1]="80"
-
-  actionTable[76][41][0]="R"
-  actionTable[76][41][1]="80"
-
-  actionTable[76][40][0]="R"
-  actionTable[76][40][1]="80"
-
-  actionTable[76][25][0]="R"
-  actionTable[76][25][1]="80"
-
-  actionTable[76][24][0]="R"
-  actionTable[76][24][1]="80"
-
-  actionTable[76][20][0]="R"
-  actionTable[76][20][1]="80"
-
-  actionTable[76][22][0]="R"
-  actionTable[76][22][1]="80"
-
-  actionTable[76][21][0]="R"
-  actionTable[76][21][1]="80"
-
-  actionTable[76][23][0]="R"
-  actionTable[76][23][1]="80"
-
-  actionTable[76][1][0]="R"
-  actionTable[76][1][1]="80"
-
-  actionTable[76][39][0]="R"
-  actionTable[76][39][1]="80"
-
-  actionTable[76][9][0]="R"
-  actionTable[76][9][1]="80"
-
-  actionTable[76][11][0]="R"
-  actionTable[76][11][1]="80"
-
-  actionTable[76][10][0]="R"
-  actionTable[76][10][1]="80"
-
-  #-----------State 77-----------------
-  actionTable[77][69][0]="R"
-  actionTable[77][69][1]="81"
-
-  actionTable[77][13][0]="R"
-  actionTable[77][13][1]="81"
-
-  actionTable[77][2][0]="R"
-  actionTable[77][2][1]="81"
-
-  actionTable[77][4][0]="R"
-  actionTable[77][4][1]="81"
-
-  actionTable[77][41][0]="R"
-  actionTable[77][41][1]="81"
-
-  actionTable[77][40][0]="R"
-  actionTable[77][40][1]="81"
-
-  actionTable[77][25][0]="R"
-  actionTable[77][25][1]="81"
-
-  actionTable[77][24][0]="R"
-  actionTable[77][24][1]="81"
-
-  actionTable[77][20][0]="R"
-  actionTable[77][20][1]="81"
-
-  actionTable[77][22][0]="R"
-  actionTable[77][22][1]="81"
-
-  actionTable[77][21][0]="R"
-  actionTable[77][21][1]="81"
-
-  actionTable[77][23][0]="R"
-  actionTable[77][23][1]="81"
-
-  actionTable[77][1][0]="R"
-  actionTable[77][1][1]="81"
-
-  actionTable[77][39][0]="R"
-  actionTable[77][39][1]="81"
-
-  actionTable[77][9][0]="R"
-  actionTable[77][9][1]="81"
-
-  actionTable[77][11][0]="R"
-  actionTable[77][11][1]="81"
-
-  actionTable[77][10][0]="R"
-  actionTable[77][10][1]="81"
-  
-  #-----------State 78-----------------
-  actionTable[78][69][0]="R"
-  actionTable[78][69][1]="82"
-
-  actionTable[78][13][0]="R"
-  actionTable[78][13][1]="82"
-
-  actionTable[78][2][0]="R"
-  actionTable[78][2][1]="82"
-
-  actionTable[78][4][0]="R"
-  actionTable[78][4][1]="82"
-
-  actionTable[78][41][0]="R"
-  actionTable[78][41][1]="82"
-
-  actionTable[78][40][0]="R"
-  actionTable[78][40][1]="82"
-
-  actionTable[78][25][0]="R"
-  actionTable[78][25][1]="82"
-
-  actionTable[78][24][0]="R"
-  actionTable[78][24][1]="82"
-
-  actionTable[78][20][0]="R"
-  actionTable[78][20][1]="82"
-
-  actionTable[78][22][0]="R"
-  actionTable[78][22][1]="82"
-
-  actionTable[78][21][0]="R"
-  actionTable[78][21][1]="82"
-
-  actionTable[78][23][0]="R"
-  actionTable[78][23][1]="82"
-
-  actionTable[78][1][0]="R"
-  actionTable[78][1][1]="82"
-
-  actionTable[78][39][0]="R"
-  actionTable[78][39][1]="82"
-
-  actionTable[78][9][0]="R"
-  actionTable[78][9][1]="82"
-
-  actionTable[78][11][0]="R"
-  actionTable[78][11][1]="82"
-
-  actionTable[78][10][0]="R"
-  actionTable[78][10][1]="82"
-  
-  #-----------State 79-----------------
-  actionTable[79][69][0]="R"
-  actionTable[79][69][1]="83"
-
-  actionTable[79][13][0]="R"
-  actionTable[79][13][1]="83"
-
-  actionTable[79][2][0]="R"
-  actionTable[79][2][1]="83"
-
-  actionTable[79][4][0]="R"
-  actionTable[79][4][1]="83"
-
-  actionTable[79][41][0]="R"
-  actionTable[79][41][1]="83"
-
-  actionTable[79][40][0]="R"
-  actionTable[79][40][1]="83"
-
-  actionTable[79][25][0]="R"
-  actionTable[79][25][1]="83"
-
-  actionTable[79][24][0]="R"
-  actionTable[79][24][1]="83"
-
-  actionTable[79][20][0]="R"
-  actionTable[79][20][1]="83"
-
-  actionTable[79][22][0]="R"
-  actionTable[79][22][1]="83"
-
-  actionTable[79][21][0]="R"
-  actionTable[79][21][1]="83"
-
-  actionTable[79][23][0]="R"
-  actionTable[79][23][1]="83"
-
-  actionTable[79][1][0]="R"
-  actionTable[79][1][1]="83"
-
-  actionTable[79][39][0]="R"
-  actionTable[79][39][1]="83"
-
-  actionTable[79][9][0]="R"
-  actionTable[79][9][1]="83"
-
-  actionTable[79][11][0]="R"
-  actionTable[79][11][1]="83"
-
-  actionTable[79][10][0]="R"
-  actionTable[79][10][1]="83"
-  
-  #-----------State 80-----------------
-  actionTable[80][13][0]="D"
-  actionTable[80][13][1]="109"
-  
-  #-----------State 81-----------------
-  actionTable[81][4][0]="D"
-  actionTable[81][4][1]="110"
-  
-  #-----------State 82-----------------
-  actionTable[82][69][0]="D"
-  actionTable[82][69][1]="113"
-
-  actionTable[82][2][0]="D"
-  actionTable[82][2][1]="112"
-  
-  #-----------State 83-----------------
-  actionTable[83][4][0]="R"
-  actionTable[83][4][1]="33"
-
-  actionTable[83][6][0]="R"
-  actionTable[83][6][1]="33"
-  
-  #-----------State 84-----------------
-  actionTable[84][13][0]="R"
-  actionTable[84][13][1]="28"
-
-  actionTable[84][67][0]="R"
-  actionTable[84][67][1]="28"
-
-  actionTable[84][8][0]="R"
-  actionTable[84][8][1]="28"
-
-  actionTable[84][49][0]="R"
-  actionTable[84][49][1]="28"
-
-  actionTable[84][50][0]="R"
-  actionTable[84][50][1]="28"
-
-  actionTable[84][51][0]="R"
-  actionTable[84][51][1]="28"
-
-  actionTable[84][54][0]="R"
-  actionTable[84][54][1]="28"
-
-  actionTable[84][38][0]="R"
-  actionTable[84][38][1]="28"
-
-  actionTable[84][57][0]="R"
-  actionTable[84][57][1]="28"
-  
-  #-----------State 85-----------------
-  actionTable[85][13][0]="R"
-  actionTable[85][13][1]="29"
-  
-  actionTable[85][67][0]="R"
-  actionTable[85][67][1]="29"
-
-  actionTable[85][8][0]="R"
-  actionTable[85][8][1]="29"
-
-  actionTable[85][49][0]="R"
-  actionTable[85][49][1]="29"
-
-  actionTable[85][50][0]="R"
-  actionTable[85][50][1]="29"
-
-  actionTable[85][51][0]="R"
-  actionTable[85][51][1]="29"
-
-  actionTable[85][54][0]="R"
-  actionTable[85][54][1]="29"
-
-  actionTable[85][38][0]="R"
-  actionTable[85][38][1]="29"
-
-  actionTable[85][57][0]="R"
-  actionTable[85][57][1]="29"
-
-  #-----------State 86-----------------
-  actionTable[86][4][0]="D"
-  actionTable[86][4][1]="144"
-  
-  #-----------State 87-----------------
-  actionTable[87][13][0]="D"
-  actionTable[87][13][1]="48"
-
-  actionTable[87][67][0]="D"
-  actionTable[87][67][1]="40"
-
-  actionTable[87][8][0]="D"
-  actionTable[87][8][1]="115"
-
-  actionTable[87][49][0]="D"
-  actionTable[87][49][1]="41"
-
-  actionTable[87][50][0]="D"
-  actionTable[87][50][1]="42"
-
-  actionTable[87][51][0]="D"
-  actionTable[87][51][1]="44"
-
-  actionTable[87][54][0]="D"
-  actionTable[87][54][1]="45"
-
-  actionTable[87][38][0]="D"
-  actionTable[87][38][1]="46"
-
-  actionTable[87][57][0]="D"
-  actionTable[87][57][1]="47"
-
-  #-----------State 88-----------------
-  actionTable[88][13][0]="R"
-  actionTable[88][13][1]="43"
-
-  actionTable[88][67][0]="R"
-  actionTable[88][67][1]="43"
-
-  actionTable[88][8][0]="R"
-  actionTable[88][8][1]="43"
-
-  actionTable[88][49][0]="R"
-  actionTable[88][49][1]="43"
-
-  actionTable[88][50][0]="R"
-  actionTable[88][50][1]="43"
-
-  actionTable[88][51][0]="R"
-  actionTable[88][51][1]="43"
-
-  actionTable[88][54][0]="R"
-  actionTable[88][54][1]="43"
-
-  actionTable[88][38][0]="R"
-  actionTable[88][38][1]="43"
-
-  actionTable[88][57][0]="R"
-  actionTable[88][57][1]="43"
-  
-  #-----------State 89-----------------
-  actionTable[89][67][0]="D"
-  actionTable[89][67][1]="70"
-
-  actionTable[89][3][0]="D"
-  actionTable[89][3][1]="74"
-
-  actionTable[89][1][0]="D"
-  actionTable[89][1][1]="67"
-
-  actionTable[89][39][0]="D"
-  actionTable[89][39][1]="68"
-
-  actionTable[89][61][0]="D"
-  actionTable[89][61][1]="69"
-
-  actionTable[89][5][0]="D"
-  actionTable[89][5][1]="75"
-
-  actionTable[89][65][0]="D"
-  actionTable[89][65][1]="76"
-
-  actionTable[89][64][0]="D"
-  actionTable[89][64][1]="77"
-
-  actionTable[89][66][0]="D"
-  actionTable[89][66][1]="78"
-
-  actionTable[89][63][0]="D"
-  actionTable[89][63][1]="79"
-  
-  #-----------State 90-----------------
-  actionTable[90][67][0]="D"
-  actionTable[90][67][1]="70"
-
-  actionTable[90][3][0]="D"
-  actionTable[90][3][1]="74"
-
-  actionTable[90][1][0]="D"
-  actionTable[90][1][1]="67"
-
-  actionTable[90][39][0]="D"
-  actionTable[90][39][1]="68"
-
-  actionTable[90][61][0]="D"
-  actionTable[90][61][1]="69"
-
-  actionTable[90][5][0]="D"
-  actionTable[90][5][1]="75"
-
-  actionTable[90][65][0]="D"
-  actionTable[90][65][1]="76"
-
-  actionTable[90][64][0]="D"
-  actionTable[90][64][1]="77"
-
-  actionTable[90][66][0]="D"
-  actionTable[90][66][1]="78"
-
-  actionTable[90][63][0]="D"
-  actionTable[90][63][1]="79"
-  
-  #-----------State 91-----------------
-  actionTable[91][67][0]="D"
-  actionTable[91][67][1]="70"
-
-  actionTable[91][3][0]="D"
-  actionTable[91][3][1]="74"
-
-  actionTable[91][1][0]="D"
-  actionTable[91][1][1]="67"
-
-  actionTable[91][39][0]="D"
-  actionTable[91][39][1]="68"
-
-  actionTable[91][61][0]="D"
-  actionTable[91][61][1]="69"
-
-  actionTable[91][5][0]="D"
-  actionTable[91][5][1]="75"
-
-  actionTable[91][65][0]="D"
-  actionTable[91][65][1]="76"
-
-  actionTable[91][64][0]="D"
-  actionTable[91][64][1]="77"
-
-  actionTable[91][66][0]="D"
-  actionTable[91][66][1]="78"
-
-  actionTable[91][63][0]="D"
-  actionTable[91][63][1]="79"
-  
-  #-----------State 92-----------------
-  actionTable[92][67][0]="R"
-  actionTable[92][67][1]="52"
-
-  actionTable[92][3][0]="R"
-  actionTable[92][3][1]="52"
-
-  actionTable[92][1][0]="R"
-  actionTable[92][1][1]="52"
-
-  actionTable[92][39][0]="R"
-  actionTable[92][39][1]="52"
-
-  actionTable[92][61][0]="R"
-  actionTable[92][61][1]="52"
-
-  actionTable[92][5][0]="R"
-  actionTable[92][5][1]="52"
-
-  actionTable[92][65][0]="R"
-  actionTable[92][65][1]="52"
-
-  actionTable[92][64][0]="R"
-  actionTable[92][64][1]="52"
-
-  actionTable[92][66][0]="R"
-  actionTable[92][66][1]="52"
-
-  actionTable[92][63][0]="R"
-  actionTable[92][63][1]="52"
-  
-  #-----------State 93-----------------
-  actionTable[93][67][0]="R"
-  actionTable[93][67][1]="53"
-
-  actionTable[93][3][0]="R"
-  actionTable[93][3][1]="53"
-
-  actionTable[93][1][0]="R"
-  actionTable[93][1][1]="53"
-
-  actionTable[93][39][0]="R"
-  actionTable[93][39][1]="53"
-
-  actionTable[93][61][0]="R"
-  actionTable[93][61][1]="53"
-
-  actionTable[93][5][0]="R"
-  actionTable[93][5][1]="53"
-
-  actionTable[93][65][0]="R"
-  actionTable[93][65][1]="53"
-
-  actionTable[93][64][0]="R"
-  actionTable[93][64][1]="53"
-
-  actionTable[93][66][0]="R"
-  actionTable[93][66][1]="53"
-
-  actionTable[93][63][0]="R"
-  actionTable[93][63][1]="53"
-  
-  #-----------State 94-----------------
-  actionTable[94][67][0]="D"
-  actionTable[94][67][1]="70"
-
-  actionTable[94][3][0]="D"
-  actionTable[94][3][1]="74"
-
-  actionTable[94][1][0]="D"
-  actionTable[94][1][1]="67"
-
-  actionTable[94][39][0]="D"
-  actionTable[94][39][1]="68"
-
-  actionTable[94][61][0]="D"
-  actionTable[94][61][1]="69"
-
-  actionTable[94][5][0]="D"
-  actionTable[94][5][1]="75"
-
-  actionTable[94][65][0]="D"
-  actionTable[94][65][1]="76"
-
-  actionTable[94][64][0]="D"
-  actionTable[94][64][1]="77"
-
-  actionTable[94][66][0]="D"
-  actionTable[94][66][1]="78"
-
-  actionTable[94][63][0]="D"
-  actionTable[94][63][1]="79"
-
-  #-----------State 95-----------------
-  actionTable[95][67][0]="R"
-  actionTable[95][67][1]="56"
-
-  actionTable[95][3][0]="R"
-  actionTable[95][3][1]="56"
-
-  actionTable[95][1][0]="R"
-  actionTable[95][1][1]="56"
-
-  actionTable[95][39][0]="R"
-  actionTable[95][39][1]="56"
-
-  actionTable[95][61][0]="R"
-  actionTable[95][61][1]="56"
-
-  actionTable[95][5][0]="R"
-  actionTable[95][5][1]="56"
-
-  actionTable[95][65][0]="R"
-  actionTable[95][65][1]="56"
-
-  actionTable[95][64][0]="R"
-  actionTable[95][64][1]="56"
-
-  actionTable[95][66][0]="R"
-  actionTable[95][66][1]="56"
-
-  actionTable[95][63][0]="R"
-  actionTable[95][63][1]="56"
-  #-----------State 96-----------------
-  actionTable[96][67][0]="R"
-  actionTable[96][67][1]="57"
-
-  actionTable[96][3][0]="R"
-  actionTable[96][3][1]="57"
-
-  actionTable[96][1][0]="R"
-  actionTable[96][1][1]="57"
-
-  actionTable[96][39][0]="R"
-  actionTable[96][39][1]="57"
-
-  actionTable[96][61][0]="R"
-  actionTable[96][61][1]="57"
-
-  actionTable[96][5][0]="R"
-  actionTable[96][5][1]="57"
-
-  actionTable[96][65][0]="R"
-  actionTable[96][65][1]="57"
-
-  actionTable[96][64][0]="R"
-  actionTable[96][64][1]="57"
-
-  actionTable[96][66][0]="R"
-  actionTable[96][66][1]="57"
-
-  actionTable[96][63][0]="R"
-  actionTable[96][63][1]="57"
-  
-  #-----------State 97-----------------
-  actionTable[97][67][0]="R"
-  actionTable[97][67][1]="57"
-
-  actionTable[97][3][0]="R"
-  actionTable[97][3][1]="57"
-
-  actionTable[97][1][0]="R"
-  actionTable[97][1][1]="57"
-
-  actionTable[97][39][0]="R"
-  actionTable[97][39][1]="57"
-
-  actionTable[97][61][0]="R"
-  actionTable[97][61][1]="57"
-
-  actionTable[97][5][0]="R"
-  actionTable[97][5][1]="57"
-
-  actionTable[97][65][0]="R"
-  actionTable[97][65][1]="57"
-
-  actionTable[97][64][0]="R"
-  actionTable[97][64][1]="57"
-
-  actionTable[97][66][0]="R"
-  actionTable[97][66][1]="57"
-
-  actionTable[97][63][0]="R"
-  actionTable[97][63][1]="57"
-  
-  #-----------State 98-----------------
-  actionTable[98][67][0]="R"
-  actionTable[98][67][1]="59"
-
-  actionTable[98][3][0]="R"
-  actionTable[98][3][1]="59"
-
-  actionTable[98][1][0]="R"
-  actionTable[98][1][1]="59"
-
-  actionTable[98][39][0]="R"
-  actionTable[98][39][1]="59"
-
-  actionTable[98][61][0]="R"
-  actionTable[98][61][1]="59"
-
-  actionTable[98][5][0]="R"
-  actionTable[98][5][1]="59"
-
-  actionTable[98][65][0]="R"
-  actionTable[98][65][1]="59"
-
-  actionTable[98][64][0]="R"
-  actionTable[98][64][1]="59"
-
-  actionTable[98][66][0]="R"
-  actionTable[98][66][1]="59"
-
-  actionTable[98][63][0]="R"
-  actionTable[98][63][1]="59"
-
-  actionTable[99][67][0] = "D"
-  actionTable[99][67][1] = "70"
-
-  actionTable[99][3][0] = "D"
-  actionTable[99][3][1] = "74"
-
-  actionTable[99][1][0] = "D"
-  actionTable[99][1][1] = "67"
 
-  actionTable[99][39][0] = "D"
+  # --------- Juanpa -----------
+  actionTable[2][48][0]="D"
+  actionTable[2][48][1]="6"
+  actionTable[2][67][0]="D"
+  actionTable[2][67][1]="7"
+  actionTable[2][68][0]="R"
+  actionTable[2][68][1]="1"
+
+  actionTable[3][48][0]="R"
+  actionTable[3][48][1]="2"
+  actionTable[3][67][0]="R"
+  actionTable[3][67][1]="2"
+  actionTable[3][68][0]="R"
+  actionTable[3][68][1]="2"
+
+  actionTable[4][48][0]="R"
+  actionTable[4][48][1]="4"
+  actionTable[4][67][0]="R"
+  actionTable[4][67][1]="4"
+  actionTable[4][68][0]="R"
+  actionTable[4][68][1]="4"
+
+  actionTable[5][48][0]="R"
+  actionTable[5][48][1]="5"
+  actionTable[5][67][0]="R"
+  actionTable[5][67][1]="5"
+  actionTable[5][68][0]="R"
+  actionTable[5][68][1]="5"
+
+  actionTable[6][67][0]="D"
+  actionTable[6][67][1]="10"
+
+  actionTable[7][3][0]="D"
+  actionTable[7][3][1]="11"
+
+  actionTable[8][13][0]="D"
+  actionTable[8][13][1]="12"
+
+  actionTable[9][13][0]="R"
+  actionTable[9][13][1]="7"
+
+  actionTable[10][13][0]="R"
+  actionTable[10][13][1]="10"
+  actionTable[10][2][0]="D"
+  actionTable[10][2][1]="14"
+  actionTable[10][4][0]="R"
+  actionTable[10][4][1]="10"
+
+  actionTable[11][67][0]="D"
+  actionTable[11][67][1]="10"
+  actionTable[11][4][0]="R"
+  actionTable[11][4][1]="13"
+  
+  actionTable[12][48][0]="R"
+  actionTable[12][48][1]="6"
+  actionTable[12][13][0]="R"
+  actionTable[12][13][1]="6"
+  actionTable[12][67][0]="R"
+  actionTable[12][67][1]="6"
+  actionTable[12][8][0]="R"
+  actionTable[12][8][1]="6"
+  actionTable[12][49][0]="R"
+  actionTable[12][49][1]="6"
+  actionTable[12][50][0]="R"
+  actionTable[12][50][1]="6"
+  actionTable[12][51][0]="R"
+  actionTable[12][51][1]="6"
+  actionTable[12][54][0]="R"
+  actionTable[12][54][1]="6"
+  actionTable[12][38][0]="R"
+  actionTable[12][38][1]="6"
+  actionTable[12][57][0]="R"
+  actionTable[12][57][1]="6"
+  actionTable[12][68][0]="R"
+  actionTable[12][68][1]="6"
+
+  actionTable[13][13][0]="R"
+  actionTable[13][13][1]="8"
+  actionTable[13][4][0]="R"
+  actionTable[13][4][1]="8"
+
+  actionTable[14][67][0]="D"
+  actionTable[14][67][1]="17"
+
+  actionTable[15][4][0]="D"
+  actionTable[15][4][1]="18"
+
+  actionTable[16][4][0]="R"
+  actionTable[16][4][1]="12"
+
+  actionTable[17][13][0]="R"
+  actionTable[17][13][1]="10"
+  actionTable[17][2][0]="D"
+  actionTable[17][2][1]="14"
+  actionTable[17][4][0]="R"
+  actionTable[17][4][1]="10"
+
+  actionTable[18][7][0]="D"
+  actionTable[18][7][1]="20"
+
+  actionTable[19][13][0]="R"
+  actionTable[19][13][1]="9"
+  actionTable[19][4][0]="R"
+  actionTable[19][4][1]="9"
+
+  actionTable[20][48][0]="R"
+  actionTable[20][48][1]="15"
+  actionTable[20][13][0]="R"
+  actionTable[20][13][1]="15"
+  actionTable[20][67][0]="R"
+  actionTable[20][67][1]="15"
+  actionTable[20][8][0]="R"
+  actionTable[20][8][1]="15"
+  actionTable[20][49][0]="R"
+  actionTable[20][49][1]="15"
+  actionTable[20][50][0]="R"
+  actionTable[20][50][1]="15"
+  actionTable[20][51][0]="R"
+  actionTable[20][51][1]="15"
+  actionTable[20][54][0]="R"
+  actionTable[20][54][1]="15"
+  actionTable[20][38][0]="R"
+  actionTable[20][38][1]="15"
+  actionTable[20][57][0]="R"
+  actionTable[20][57][1]="15"
+  actionTable[20][68][0]="R"
+  actionTable[20][68][1]="15"
+
+  actionTable[21][48][0]="D"
+  actionTable[21][48][1]="6"
+  actionTable[21][13][0]="R"
+  actionTable[21][13][1]="17"
+  actionTable[21][67][0]="R"
+  actionTable[21][67][1]="17"
+  actionTable[21][68][0]="R"
+  actionTable[21][68][1]="17"
+  actionTable[21][68][0]="R"
+  actionTable[21][68][1]="17"
+  actionTable[21][68][0]="R"
+  actionTable[21][68][1]="17"
+  actionTable[21][68][0]="R"
+  actionTable[21][68][1]="17"
+  actionTable[21][68][0]="R"
+  actionTable[21][68][1]="17"
+  actionTable[21][68][0]="R"
+  actionTable[21][68][1]="17"
+  actionTable[21][68][0]="R"
+  actionTable[21][68][1]="17"
+
+  actionTable[22][13][0]="D"
+  actionTable[22][13][1]="43"
+  actionTable[22][67][0]="D"
+  actionTable[22][67][1]="35"
+  actionTable[22][8][0]="D"
+  actionTable[22][8][1]="24"
+  actionTable[22][49][0]="D"
+  actionTable[22][49][1]="36"
+  actionTable[22][50][0]="D"
+  actionTable[22][50][1]="37"
+  actionTable[22][51][0]="D"
+  actionTable[22][51][1]="39"
+  actionTable[22][54][0]="D"
+  actionTable[22][54][1]="40"
+  actionTable[22][38][0]="D"
+  actionTable[22][38][1]="41"
+  actionTable[22][57][0]="D"
+  actionTable[22][57][1]="42"
+
+  actionTable[23][48][0]="R"
+  actionTable[23][48][1]="14"
+  actionTable[23][13][0]="R"
+  actionTable[23][13][1]="14"
+  actionTable[23][67][0]="R"
+  actionTable[23][67][1]="14"
+  actionTable[23][8][0]="R"
+  actionTable[23][8][1]="14"
+  actionTable[23][49][0]="R"
+  actionTable[23][49][1]="14"
+  actionTable[23][50][0]="R"
+  actionTable[23][50][1]="14"
+  actionTable[23][51][0]="R"
+  actionTable[23][51][1]="14"
+  actionTable[23][54][0]="R"
+  actionTable[23][54][1]="14"
+  actionTable[23][38][0]="R"
+  actionTable[23][38][1]="14"
+  actionTable[23][57][0]="R"
+  actionTable[23][57][1]="14"
+  actionTable[23][68][0]="R"
+  actionTable[23][68][1]="14"
+
+  actionTable[24][48][0]="R"
+  actionTable[24][48][1]="11"
+  actionTable[24][67][0]="R"
+  actionTable[24][67][1]="11"
+  actionTable[24][68][0]="R"
+  actionTable[24][68][1]="11"
+
+  actionTable[25][13][0]="R"
+  actionTable[25][13][1]="16"
+  actionTable[25][67][0]="R"
+  actionTable[25][67][1]="16"
+  actionTable[25][8][0]="R"
+  actionTable[25][8][1]="16"
+  actionTable[25][49][0]="R"
+  actionTable[25][49][1]="16"
+  actionTable[25][50][0]="R"
+  actionTable[25][50][1]="16"
+  actionTable[25][51][0]="R"
+  actionTable[25][51][1]="16"
+  actionTable[25][54][0]="R"
+  actionTable[25][54][1]="16"
+  actionTable[25][38][0]="R"
+  actionTable[25][38][1]="16"
+  actionTable[25][57][0]="R"
+  actionTable[25][57][1]="16"
+
+  actionTable[26][13][0]="R"
+  actionTable[26][13][1]="18"
+  actionTable[26][67][0]="R"
+  actionTable[26][67][1]="18"
+  actionTable[26][8][0]="R"
+  actionTable[26][8][1]="18"
+  actionTable[26][49][0]="R"
+  actionTable[26][49][1]="18"
+  actionTable[26][50][0]="R"
+  actionTable[26][50][1]="18"
+  actionTable[26][51][0]="R"
+  actionTable[26][51][1]="18"
+  actionTable[26][54][0]="R"
+  actionTable[26][54][1]="18"
+  actionTable[26][38][0]="R"
+  actionTable[26][38][1]="18"
+  actionTable[26][57][0]="R"
+  actionTable[26][57][1]="18"
+
+  actionTable[27][13][0]="R"
+  actionTable[27][13][1]="19"
+  actionTable[27][67][0]="R"
+  actionTable[27][67][1]="19"
+  actionTable[27][8][0]="R"
+  actionTable[27][8][1]="19"
+  actionTable[27][49][0]="R"
+  actionTable[27][49][1]="19"
+  actionTable[27][50][0]="R"
+  actionTable[27][50][1]="19"
+  actionTable[27][51][0]="R"
+  actionTable[27][51][1]="19"
+  actionTable[27][54][0]="R"
+  actionTable[27][54][1]="19"
+  actionTable[27][38][0]="R"
+  actionTable[27][38][1]="19"
+  actionTable[27][57][0]="R"
+  actionTable[27][57][1]="19"
+
+  actionTable[28][13][0]="R"
+  actionTable[28][13][1]="20"
+  actionTable[28][67][0]="R"
+  actionTable[28][67][1]="20"
+  actionTable[28][8][0]="R"
+  actionTable[28][8][1]="20"
+  actionTable[28][49][0]="R"
+  actionTable[28][49][1]="20"
+  actionTable[28][50][0]="R"
+  actionTable[28][50][1]="20"
+  actionTable[28][51][0]="R"
+  actionTable[28][51][1]="20"
+  actionTable[28][54][0]="R"
+  actionTable[28][54][1]="20"
+  actionTable[28][38][0]="R"
+  actionTable[28][38][1]="20"
+  actionTable[28][57][0]="R"
+  actionTable[28][57][1]="20"
+
+  actionTable[29][13][0]="R"
+  actionTable[29][13][1]="21"
+  actionTable[29][67][0]="R"
+  actionTable[29][67][1]="21"
+  actionTable[29][8][0]="R"
+  actionTable[29][8][1]="21"
+  actionTable[29][49][0]="R"
+  actionTable[29][49][1]="21"
+  actionTable[29][50][0]="R"
+  actionTable[29][50][1]="21"
+  actionTable[29][51][0]="R"
+  actionTable[29][51][1]="21"
+  actionTable[29][54][0]="R"
+  actionTable[29][54][1]="21"
+  actionTable[29][38][0]="R"
+  actionTable[29][38][1]="21"
+  actionTable[29][57][0]="R"
+  actionTable[29][57][1]="21"
+
+  actionTable[30][13][0]="R"
+  actionTable[30][13][1]="22"
+  actionTable[30][67][0]="R"
+  actionTable[30][67][1]="22"
+  actionTable[30][8][0]="R"
+  actionTable[30][8][1]="22"
+  actionTable[30][49][0]="R"
+  actionTable[30][49][1]="22"
+  actionTable[30][50][0]="R"
+  actionTable[30][50][1]="22"
+  actionTable[30][51][0]="R"
+  actionTable[30][51][1]="22"
+  actionTable[30][54][0]="R"
+  actionTable[30][54][1]="22"
+  actionTable[30][38][0]="R"
+  actionTable[30][38][1]="22"
+  actionTable[30][57][0]="R"
+  actionTable[30][57][1]="22"
+
+  actionTable[31][13][0]="R"
+  actionTable[31][13][1]="23"
+  actionTable[31][67][0]="R"
+  actionTable[31][67][1]="23"
+  actionTable[31][8][0]="R"
+  actionTable[31][8][1]="23"
+  actionTable[31][49][0]="R"
+  actionTable[31][49][1]="23"
+  actionTable[31][50][0]="R"
+  actionTable[31][50][1]="23"
+  actionTable[31][51][0]="R"
+  actionTable[31][51][1]="23"
+  actionTable[31][54][0]="R"
+  actionTable[31][54][1]="23"
+  actionTable[31][38][0]="R"
+  actionTable[31][38][1]="23"
+  actionTable[31][57][0]="R"
+  actionTable[31][57][1]="23"
+
+  actionTable[32][13][0]="R"
+  actionTable[32][13][1]="24"
+  actionTable[32][67][0]="R"
+  actionTable[32][67][1]="24"
+  actionTable[32][8][0]="R"
+  actionTable[32][8][1]="24"
+  actionTable[32][49][0]="R"
+  actionTable[32][49][1]="24"
+  actionTable[32][50][0]="R"
+  actionTable[32][50][1]="24"
+  actionTable[32][51][0]="R"
+  actionTable[32][51][1]="24"
+  actionTable[32][54][0]="R"
+  actionTable[32][54][1]="24"
+  actionTable[32][38][0]="R"
+  actionTable[32][38][1]="24"
+  actionTable[32][57][0]="R"
+  actionTable[32][57][1]="24"
+
+  actionTable[33][13][0]="R"
+  actionTable[33][13][1]="25"
+  actionTable[33][67][0]="R"
+  actionTable[33][67][1]="25"
+  actionTable[33][8][0]="R"
+  actionTable[33][8][1]="25"
+  actionTable[33][49][0]="R"
+  actionTable[33][49][1]="25"
+  actionTable[33][50][0]="R"
+  actionTable[33][50][1]="25"
+  actionTable[33][51][0]="R"
+  actionTable[33][51][1]="25"
+  actionTable[33][54][0]="R"
+  actionTable[33][54][1]="25"
+  actionTable[33][38][0]="R"
+  actionTable[33][38][1]="25"
+  actionTable[33][57][0]="R"
+  actionTable[33][57][1]="25"
+
+  actionTable[34][13][0]="R"
+  actionTable[34][13][1]="26"
+  actionTable[34][67][0]="R"
+  actionTable[34][67][1]="26"
+  actionTable[34][8][0]="R"
+  actionTable[34][8][1]="26"
+  actionTable[34][49][0]="R"
+  actionTable[34][49][1]="26"
+  actionTable[34][50][0]="R"
+  actionTable[34][50][1]="26"
+  actionTable[34][51][0]="R"
+  actionTable[34][51][1]="26"
+  actionTable[34][54][0]="R"
+  actionTable[34][54][1]="26"
+  actionTable[34][38][0]="R"
+  actionTable[34][38][1]="26"
+  actionTable[34][57][0]="R"
+  actionTable[34][57][1]="26"
+
+  actionTable[35][3][0]="D"
+  actionTable[35][3][1]="45"
+  actionTable[35][14][0]="D"
+  actionTable[35][14][1]="44"
+
+  actionTable[36][67][0]="D"
+  actionTable[36][67][1]="46"
+
+  actionTable[37][67][0]="D"
+  actionTable[37][67][1]="47"
+
+  actionTable[38][13][0]="D"
+  actionTable[38][13][1]="48"
+  
+  actionTable[39][3][0]="D"
+  actionTable[39][3][1]="49"
+
+  actionTable[40][7][0]="D"
+  actionTable[40][7][1]="50"
+
+  actionTable[41][13][0]="D"
+  actionTable[41][13][1]="51"
+
+  actionTable[42][67][0]="D"
+  actionTable[42][67][1]="65"
+  actionTable[42][3][0]="D"
+  actionTable[42][3][1]="69"
+  actionTable[42][1][0]="D"
+  actionTable[42][1][1]="62"
+  actionTable[42][39][0]="D"
+  actionTable[42][39][1]="63"
+  actionTable[42][61][0]="D"
+  actionTable[42][61][1]="64"
+  actionTable[42][5][0]="D"
+  actionTable[42][5][1]="70"
+  actionTable[42][65][0]="D"
+  actionTable[42][65][1]="71"
+  actionTable[42][64][0]="D"
+  actionTable[42][64][1]="72"
+  actionTable[42][66][0]="D"
+  actionTable[42][66][1]="73"
+  actionTable[42][63][0]="D"
+  actionTable[42][63][1]="74"
+
+  actionTable[43][13][0]="R"
+  actionTable[43][13][1]="44"
+  actionTable[43][67][0]="R"
+  actionTable[43][67][1]="44"
+  actionTable[43][8][0]="R"
+  actionTable[43][8][1]="44"
+  actionTable[43][49][0]="R"
+  actionTable[43][49][1]="44"
+  actionTable[43][50][0]="R"
+  actionTable[43][50][1]="44"
+  actionTable[43][51][0]="R"
+  actionTable[43][51][1]="44"
+  actionTable[43][54][0]="R"
+  actionTable[43][54][1]="44"
+  actionTable[43][38][0]="R"
+  actionTable[43][38][1]="44"
+  actionTable[43][57][0]="R"
+  actionTable[43][57][1]="44"
+
+  actionTable[44][67][0]="D"
+  actionTable[44][67][1]="65"
+  actionTable[44][3][0]="D"
+  actionTable[44][3][1]="69"
+  actionTable[44][1][0]="D"
+  actionTable[44][1][1]="62"
+  actionTable[44][39][0]="D"
+  actionTable[44][39][1]="63"
+  actionTable[44][61][0]="D"
+  actionTable[44][61][1]="64"
+  actionTable[44][5][0]="D"
+  actionTable[44][5][1]="70"
+  actionTable[44][65][0]="D"
+  actionTable[44][65][1]="71"
+  actionTable[44][64][0]="D"
+  actionTable[44][64][1]="72"
+  actionTable[44][66][0]="D"
+  actionTable[44][66][1]="73"
+  actionTable[44][63][0]="D"
+  actionTable[44][63][1]="74"
+
+  actionTable[45][67][0]="D"
+  actionTable[45][67][1]="65"
+  actionTable[45][3][0]="D"
+  actionTable[45][3][1]="69"
+  actionTable[45][4][0]="R"
+  actionTable[45][4][1]="33"
+  actionTable[45][1][0]="D"
+  actionTable[45][1][1]="62"
+  actionTable[45][39][0]="D"
+  actionTable[45][39][1]="63"
+  actionTable[45][61][0]="D"
+  actionTable[45][61][1]="64"
+  actionTable[45][5][0]="D"
+  actionTable[45][5][1]="70"
+  actionTable[45][6][0]="R"
+  actionTable[45][6][1]="33"
+  actionTable[45][65][0]="D"
+  actionTable[45][65][1]="71"
+  actionTable[45][64][0]="D"
+  actionTable[45][64][1]="72"
+  actionTable[45][66][0]="D"
+  actionTable[45][66][1]="73"
+  actionTable[45][63][0]="D"
+  actionTable[45][63][1]="74"
+
+  actionTable[46][13][0]="D"
+  actionTable[46][13][1]="78"
+
+  actionTable[47][13][0]="D"
+  actionTable[47][13][1]="79"
+
+  actionTable[48][13][0]="R"
+  actionTable[48][13][1]="30"
+  actionTable[48][67][0]="R"
+  actionTable[48][67][1]="30"
+  actionTable[48][8][0]="R"
+  actionTable[48][8][1]="30"
+  actionTable[48][49][0]="R"
+  actionTable[48][49][1]="30"
+  actionTable[48][50][0]="R"
+  actionTable[48][50][1]="30"
+  actionTable[48][51][0]="R"
+  actionTable[48][51][1]="30"
+  actionTable[48][54][0]="R"
+  actionTable[48][54][1]="30"
+  actionTable[48][38][0]="R"
+  actionTable[48][38][1]="30"
+  actionTable[48][57][0]="R"
+  actionTable[48][57][1]="30"
+
+  actionTable[49][67][0]="D"
+  actionTable[49][67][1]="65"
+  actionTable[49][3][0]="D"
+  actionTable[49][3][1]="69"
+  actionTable[49][1][0]="D"
+  actionTable[49][1][1]="62"
+  actionTable[49][39][0]="D"
+  actionTable[49][39][1]="63"
+  actionTable[49][61][0]="D"
+  actionTable[49][61][1]="64"
+  actionTable[49][5][0]="D"
+  actionTable[49][5][1]="70"
+  actionTable[49][65][0]="D"
+  actionTable[49][65][1]="71"
+  actionTable[49][64][0]="D"
+  actionTable[49][64][1]="72"
+  actionTable[49][66][0]="D"
+  actionTable[49][66][1]="73"
+  actionTable[49][63][0]="D"
+  actionTable[49][63][1]="74"
+
+  actionTable[50][13][0]="R"
+  actionTable[50][13][1]="17"
+  actionTable[50][67][0]="R"
+  actionTable[50][67][1]="17"
+  actionTable[50][8][0]="R"
+  actionTable[50][8][1]="17"
+  actionTable[50][49][0]="R"
+  actionTable[50][49][1]="17"
+  actionTable[50][50][0]="R"
+  actionTable[50][50][1]="17"
+  actionTable[50][51][0]="R"
+  actionTable[50][51][1]="17"
+  actionTable[50][54][0]="R"
+  actionTable[50][54][1]="17"
+  actionTable[50][38][0]="R"
+  actionTable[50][38][1]="17"
+  actionTable[50][57][0]="R"
+  actionTable[50][57][1]="17"
+
+  actionTable[51][13][0]="R"
+  actionTable[51][13][1]="42"
+  actionTable[51][67][0]="R"
+  actionTable[51][67][1]="42"
+  actionTable[51][8][0]="R"
+  actionTable[51][8][1]="42"
+  actionTable[51][49][0]="R"
+  actionTable[51][49][1]="42"
+  actionTable[51][50][0]="R"
+  actionTable[51][50][1]="42"
+  actionTable[51][51][0]="R"
+  actionTable[51][51][1]="42"
+  actionTable[51][54][0]="R"
+  actionTable[51][54][1]="42"
+  actionTable[51][38][0]="R"
+  actionTable[51][38][1]="42"
+  actionTable[51][57][0]="R"
+  actionTable[51][57][1]="42"
+
+  actionTable[52][13][0]="D"
+  actionTable[52][13][1]="82"
+
+  actionTable[53][13][0]="R"
+  actionTable[53][13][1]="45"
+  actionTable[53][2][0]="R"
+  actionTable[53][2][1]="45"
+  actionTable[53][4][0]="R"
+  actionTable[53][4][1]="45"
+  actionTable[53][41][0]="D"
+  actionTable[53][41][1]="83"
+  actionTable[53][6][0]="R"
+  actionTable[53][6][1]="45"
+
+  actionTable[54][13][0]="R"
+  actionTable[54][13][1]="47"
+  actionTable[54][2][0]="R"
+  actionTable[54][2][1]="47"
+  actionTable[54][4][0]="R"
+  actionTable[54][4][1]="47"
+  actionTable[54][41][0]="R"
+  actionTable[54][41][1]="47"
+  actionTable[54][40][0]="D"
+  actionTable[54][40][1]="84"
+  actionTable[54][6][0]="R"
+  actionTable[54][6][1]="47"
+
+  actionTable[55][13][0]="R"
+  actionTable[55][13][1]="49"
+  actionTable[55][2][0]="R"
+  actionTable[55][2][1]="49"
+  actionTable[55][4][0]="R"
+  actionTable[55][4][1]="49"
+  actionTable[55][41][0]="R"
+  actionTable[55][41][1]="49"
+  actionTable[55][40][0]="R"
+  actionTable[55][40][1]="49"
+  actionTable[55][25][0]="D"
+  actionTable[55][25][1]="86"
+  actionTable[55][24][0]="D"
+  actionTable[55][24][1]="87"
+  actionTable[55][6][0]="R"
+  actionTable[55][6][1]="49"
+
+  
+  actionTable[56][13][0]="R"
+  actionTable[56][13][1]="51"
+  actionTable[56][2][0]="R"
+  actionTable[56][2][1]="51"
+  actionTable[56][4][0]="R"
+  actionTable[56][4][1]="51"
+  actionTable[56][41][0]="R"
+  actionTable[56][41][1]="51"
+  actionTable[56][40][0]="R"
+  actionTable[56][40][1]="51"
+  actionTable[56][25][0]="R"
+  actionTable[56][25][1]="51"
+  actionTable[56][24][0]="R"
+  actionTable[56][24][1]="51"
+  actionTable[56][20][0]="D"
+  actionTable[56][20][1]="89"
+  actionTable[56][22][0]="D"
+  actionTable[56][22][1]="90"
+  actionTable[56][21][0]="D"
+  actionTable[56][21][1]="91"
+  actionTable[56][23][0]="D"
+  actionTable[56][23][1]="92"
+  actionTable[56][6][0]="R"
+  actionTable[56][6][1]="51"
+
+  actionTable[57][13][0]="R"
+  actionTable[57][13][1]="55"
+  actionTable[57][2][0]="R"
+  actionTable[57][2][1]="55"
+  actionTable[57][4][0]="R"
+  actionTable[57][4][1]="55"
+  actionTable[57][41][0]="R"
+  actionTable[57][41][1]="55"
+  actionTable[57][40][0]="R"
+  actionTable[57][40][1]="55"
+  actionTable[57][25][0]="R"
+  actionTable[57][25][1]="55"
+  actionTable[57][24][0]="R"
+  actionTable[57][24][1]="55"
+  actionTable[57][20][0]="R"
+  actionTable[57][20][1]="55"
+  actionTable[57][22][0]="R"
+  actionTable[57][22][1]="55"
+  actionTable[57][21][0]="R"
+  actionTable[57][21][1]="55"
+  actionTable[57][23][0]="R"
+  actionTable[57][23][1]="55"
+  actionTable[57][1][0]="D"
+  actionTable[57][1][1]="94"
+  actionTable[57][39][0]="D"
+  actionTable[57][39][1]="95"
+  actionTable[57][6][0]="R"
+  actionTable[57][6][1]="55"
+
+  actionTable[58][13][0]="R"
+  actionTable[58][13][1]="61"
+  actionTable[58][2][0]="R"
+  actionTable[58][2][1]="61"
+  actionTable[58][4][0]="R"
+  actionTable[58][4][1]="61"
+  actionTable[58][41][0]="R"
+  actionTable[58][41][1]="61"
+  actionTable[58][40][0]="R"
+  actionTable[58][40][1]="61"
+  actionTable[58][25][0]="R"
+  actionTable[58][25][1]="61"
+  actionTable[58][24][0]="R"
+  actionTable[58][24][1]="61"
+  actionTable[58][20][0]="R"
+  actionTable[58][20][1]="61"
+  actionTable[58][22][0]="R"
+  actionTable[58][22][1]="61"
+  actionTable[58][21][0]="R"
+  actionTable[58][21][1]="61"
+  actionTable[58][23][0]="R"
+  actionTable[58][23][1]="61"
+  actionTable[58][1][0]="R"
+  actionTable[58][1][1]="61"
+  actionTable[58][39][0]="R"
+  actionTable[58][39][1]="61"
+  actionTable[58][9][0]="D"
+  actionTable[58][9][1]="97"
+  actionTable[58][11][0]="D"
+  actionTable[58][11][1]="98"
+  actionTable[58][10][0]="D"
+  actionTable[58][10][1]="99"
+  actionTable[58][6][0]="R"
+  actionTable[58][6][1]="61"
+
+  actionTable[59][13][0]="R"
+  actionTable[59][13][1]="65"
+  actionTable[59][2][0]="R"
+  actionTable[59][2][1]="65"
+  actionTable[59][4][0]="R"
+  actionTable[59][4][1]="65"
+  actionTable[59][41][0]="R"
+  actionTable[59][41][1]="65"
+  actionTable[59][40][0]="R"
+  actionTable[59][40][1]="65"
+  actionTable[59][25][0]="R"
+  actionTable[59][25][1]="65"
+  actionTable[59][24][0]="R"
+  actionTable[59][24][1]="65"
+  actionTable[59][20][0]="R"
+  actionTable[59][20][1]="65"
+  actionTable[59][22][0]="R"
+  actionTable[59][22][1]="65"
+  actionTable[59][21][0]="R"
+  actionTable[59][21][1]="65"
+  actionTable[59][23][0]="R"
+  actionTable[59][23][1]="65"
+  actionTable[59][1][0]="R"
+  actionTable[59][1][1]="65"
+  actionTable[59][39][0]="R"
+  actionTable[59][39][1]="65"
+  actionTable[59][9][0]="R"
+  actionTable[59][9][1]="65"
+  actionTable[59][11][0]="R"
+  actionTable[59][11][1]="65"
+  actionTable[59][10][0]="R"
+  actionTable[59][10][1]="65"
+  actionTable[59][6][0]="R"
+  actionTable[59][6][1]="65"
+
+  actionTable[60][67][0]="D"
+  actionTable[60][67][1]="65"
+  actionTable[60][3][0]="D"
+  actionTable[60][3][1]="69"
+  actionTable[60][1][0]="D"
+  actionTable[60][1][1]="62"
+  actionTable[60][39][0]="D"
+  actionTable[60][39][1]="63"
+  actionTable[60][61][0]="D"
+  actionTable[60][61][1]="64"
+  actionTable[60][5][0]="D"
+  actionTable[60][5][1]="70"
+  actionTable[60][65][0]="D"
+  actionTable[60][65][1]="71"
+  actionTable[60][64][0]="D"
+  actionTable[60][64][1]="72"
+  actionTable[60][66][0]="D"
+  actionTable[60][66][1]="73"
+  actionTable[60][63][0]="D"
+  actionTable[60][63][1]="74"
+
+  # --------- Mario ------------
+  #-------------State94------------
+  actionTable[94][67][0] = "R"
+  actionTable[94][67][1] = "62"
+
+  actionTable[94][3][0] = "R"
+  actionTable[94][3][1] = "62"
+
+  actionTable[94][1][0] = "R"
+  actionTable[94][1][1] = "62"
+
+  actionTable[94][39][0] = "R"
+  actionTable[94][39][1] = "62"
+
+  actionTable[94][61][0] = "R"
+  actionTable[94][61][1] = "62"
+
+  actionTable[94][5][0] = "R"
+  actionTable[94][5][1] = "62"
+
+  actionTable[94][65][0] = "R"
+  actionTable[94][65][1] = "62"
+
+  actionTable[94][64][0] = "R"
+  actionTable[94][64][1] = "62"
+
+  actionTable[94][66][0] = "R"
+  actionTable[94][66][1] = "62"
+
+  actionTable[94][63][0] = "R"
+  actionTable[94][63][1] = "62"
+  #-------------State95------------
+  actionTable[95][67][0] = "R"
+  actionTable[95][67][1] = "63"
+
+  actionTable[95][3][0] = "R"
+  actionTable[95][3][1] = "63"
+
+  actionTable[95][1][0] = "R"
+  actionTable[95][1][1] = "63"
+
+  actionTable[95][39][0] = "R"
+  actionTable[95][39][1] = "63"
+
+  actionTable[95][61][0] = "R"
+  actionTable[95][61][1] = "63"
+
+  actionTable[95][5][0] = "R"
+  actionTable[95][5][1] = "63"
+
+  actionTable[95][65][0] = "R"
+  actionTable[95][65][1] = "63"
+
+  actionTable[95][64][0] = "R"
+  actionTable[95][64][1] = "63"
+
+  actionTable[95][66][0] = "R"
+  actionTable[95][66][1] = "63"
+
+  actionTable[95][63][0] = "R"
+  actionTable[95][63][1] = "63"
+
+ #-------------State96------------
+  actionTable[96][67][0] = "D"
+  actionTable[96][67][1] = "65"
+
+  actionTable[96][3][0] = "D"
+  actionTable[96][3][1] = "69"
+
+  actionTable[96][1][0] = "D"
+  actionTable[96][1][1] = "62"
+
+  actionTable[96][39][0] = "D"
+  actionTable[96][39][1] = "63"
+
+  actionTable[96][61][0] = "D"
+  actionTable[96][61][1] = "64"
+
+  actionTable[96][5][0] = "D"
+  actionTable[96][5][1] = "70"
+
+  actionTable[96][65][0] = "D"
+  actionTable[96][65][1] = "71"
+
+  actionTable[96][64][0] = "D"
+  actionTable[96][64][1] = "72"
+
+  actionTable[96][66][0] = "D"
+  actionTable[96][66][1] = "73"
+
+  actionTable[96][63][0] = "D"
+  actionTable[96][63][1] = "74"
+ #-------------State97------------
+  actionTable[97][67][0] = "R"
+  actionTable[97][67][1] = "66"
+
+  actionTable[97][3][0] = "R"
+  actionTable[97][3][1] = "66"
+
+  actionTable[97][1][0] = "R"
+  actionTable[97][1][1] = "66"
+
+  actionTable[97][39][0] = "R"
+  actionTable[97][39][1] = "66"
+
+  actionTable[97][61][0] = "R"
+  actionTable[97][61][1] = "66"
+
+  actionTable[97][5][0] = "R"
+  actionTable[97][5][1] = "66"
+
+  actionTable[97][65][0] = "R"
+  actionTable[97][65][1] = "66"
+
+  actionTable[97][64][0] = "R"
+  actionTable[97][64][1] = "66"
+
+  actionTable[97][66][0] = "R"
+  actionTable[97][66][1] = "66"
+
+  actionTable[97][63][0] = "R"
+  actionTable[97][63][1] = "66"
+  
+  #-------------State98------------
+  actionTable[98][67][0] = "R"
+  actionTable[98][67][1] = "67"
+
+  actionTable[98][3][0] = "R"
+  actionTable[98][3][1] = "67"
+
+  actionTable[98][1][0] = "R"
+  actionTable[98][1][1] = "67"
+
+  actionTable[98][39][0] = "R"
+  actionTable[98][39][1] = "67"
+
+  actionTable[98][61][0] = "R"
+  actionTable[98][61][1] = "67"
+
+  actionTable[98][5][0] = "R"
+  actionTable[98][5][1] = "67"
+
+  actionTable[98][65][0] = "R"
+  actionTable[98][65][1] = "67"
+
+  actionTable[98][64][0] = "R"
+  actionTable[98][64][1] = "67"
+
+  actionTable[98][66][0] = "R"
+  actionTable[98][66][1] = "67"
+
+  actionTable[98][63][0] = "R"
+  actionTable[98][63][1] = "67"
+
+    #-------------State99------------
+  actionTable[99][67][0] = "R"
+  actionTable[99][67][1] = "68"
+
+  actionTable[99][3][0] = "R"
+  actionTable[99][3][1] = "68"
+
+  actionTable[99][1][0] = "R"
+  actionTable[99][1][1] = "68"
+
+  actionTable[99][39][0] = "R"
   actionTable[99][39][1] = "68"
 
-  actionTable[99][61][0] = "D"
-  actionTable[99][61][1] = "69"
-  
-  actionTable[99][5][0] = "D"
-  actionTable[99][5][1] = "75"
+  actionTable[99][61][0] = "R"
+  actionTable[99][61][1] = "68"
 
-  actionTable[99][65][0] = "D"
-  actionTable[99][65][1] = "76"
+  actionTable[99][5][0] = "R"
+  actionTable[99][5][1] = "68"
 
-  actionTable[99][64][0] = "D"
-  actionTable[99][64][1] = "77"
+  actionTable[99][65][0] = "R"
+  actionTable[99][65][1] = "68"
 
-  actionTable[99][66][0] = "D"
-  actionTable[99][66][1] = "78"
+  actionTable[99][64][0] = "R"
+  actionTable[99][64][1] = "68"
 
-  actionTable[99][63][0] = "D"
-  actionTable[99][63][1] = "79"
+  actionTable[99][66][0] = "R"
+  actionTable[99][66][1] = "68"
 
-  actionTable[100][67][0] = "R"
-  actionTable[100][67][1] = "62"
+  actionTable[99][63][0] = "R"
+  actionTable[99][63][1] = "68"
 
-  actionTable[100][3][0] = "R"
-  actionTable[100][3][1] = "62"
+  #-------------State100------------
+  actionTable[100][13][0] = "R"
+  actionTable[100][13][1] = "69"
+
+  actionTable[100][2][0] = "R"
+  actionTable[100][2][1] = "69"
+
+  actionTable[100][4][0] = "R"
+  actionTable[100][4][1] = "69"
+
+  actionTable[100][41][0] = "R"
+  actionTable[100][41][1] = "69"
+
+  actionTable[100][40][0] = "R"
+  actionTable[100][40][1] = "69"
+
+  actionTable[100][25][0] = "R"
+  actionTable[100][25][1] = "69"
+
+  actionTable[100][24][0] = "R"
+  actionTable[100][24][1] = "69"
+
+  actionTable[100][20][0] = "R"
+  actionTable[100][20][1] = "69"
+
+  actionTable[100][22][0] = "R"
+  actionTable[100][22][1] = "69"
+
+  actionTable[100][21][0] = "R"
+  actionTable[100][21][1] = "69"
+
+  actionTable[100][23][0] = "R"
+  actionTable[100][23][1] = "69"
 
   actionTable[100][1][0] = "R"
-  actionTable[100][1][1] = "62"
+  actionTable[100][1][1] = "69"
 
   actionTable[100][39][0] = "R"
-  actionTable[100][39][1] = "62"
+  actionTable[100][39][1] = "69"
 
-  actionTable[100][61][0] = "R"
-  actionTable[100][61][1] = "62"
+  actionTable[100][9][0] = "R"
+  actionTable[100][9][1] = "69"
 
-  actionTable[100][5][0] = "R"
-  actionTable[100][5][1] = "62"
+  actionTable[100][11][0] = "R"
+  actionTable[100][11][1] = "69"
 
-  actionTable[100][65][0] = "R"
-  actionTable[100][65][1] = "62"
+  actionTable[100][10][0] = "R"
+  actionTable[100][10][1] = "69"
 
-  actionTable[100][64][0] = "R"
-  actionTable[100][64][1] = "62"
+  actionTable[100][6][0] = "R"
+  actionTable[100][6][1] = "69"
 
-  actionTable[100][66][0] = "R"
-  actionTable[100][66][1] = "62"
+  #-------------State101------------
+  actionTable[101][4][0] = "D"
+  actionTable[101][4][1] = "115"
 
-  actionTable[100][63][0] = "R"
-  actionTable[100][63][1] = "62"
+  #-------------State102------------
+  actionTable[102][6][0] = "D"
+  actionTable[102][6][1] = "116"
 
-  actionTable[101][67][0] = "R"
-  actionTable[101][67][1] = "63"
-
-  actionTable[101][67][0] = "R"
-  actionTable[101][67][1] = "63"
-
-  actionTable[101][3][0] = "R"
-  actionTable[101][3][1] = "63"
-
-  actionTable[101][1][0] = "R"
-  actionTable[101][1][1] = "63"
-
-  actionTable[101][39][0] = "R"
-  actionTable[101][39][1] = "63"
-
-  actionTable[101][61][0] = "R"
-  actionTable[101][61][1] = "63"
-
-  actionTable[101][5][0] = "R"
-  actionTable[101][5][1] = "63"
-
-  actionTable[101][65][0] = "R"
-  actionTable[101][65][1] = "63"
-
-  actionTable[101][64][0] = "R"
-  actionTable[101][64][1] = "63"
-
-  actionTable[101][66][0] = "R"
-  actionTable[101][66][1] = "63"
-
-  actionTable[101][63][0] = "R"
-  actionTable[101][63][1] = "63"
-
-  actionTable[102][67][0] = "D"
-  actionTable[102][67][1] = "70"
-
-  actionTable[102][3][0] = "D"
-  actionTable[102][3][1] = "74"
-
-  actionTable[102][1][0] = "D"
-  actionTable[102][1][1] = "67"
-
-  actionTable[102][39][0] = "D"
-  actionTable[102][39][1] = "68"
-  
-  actionTable[102][61][0] = "D"
-  actionTable[102][61][1] = "69"
-
-  actionTable[102][5][0] = "D"
-  actionTable[102][5][1] = "75"
-
-  actionTable[102][65][0] = "D"
-  actionTable[102][65][1] = "76"
-
-  actionTable[102][64][0] = "D"
-  actionTable[102][64][1] = "77"
-
-  actionTable[102][66][0] = "D"
-  actionTable[102][66][1] = "78"
-
-  actionTable[102][63][0] = "D"
-  actionTable[102][63][1] = "79"
+  #-------------State103------------
+  actionTable[103][13][0] = "R"
+  actionTable[103][13][1] = "27"
 
   actionTable[103][67][0] = "R"
-  actionTable[103][67][1] = "66"
+  actionTable[103][67][1] = "27"
 
-  actionTable[103][3][0] = "R"
-  actionTable[103][3][1] = "66"
+  actionTable[103][8][0] = "R"
+  actionTable[103][8][1] = "27"
 
-  actionTable[103][1][0] = "R"
-  actionTable[103][1][1] = "66"
+  actionTable[103][49][0] = "R"
+  actionTable[103][49][1] = "27"
 
-  actionTable[103][39][0] = "R"
-  actionTable[103][39][1] = "66"
+  actionTable[103][50][0] = "R"
+  actionTable[103][50][1] = "27"
 
-  actionTable[103][61][0] = "R"
-  actionTable[103][61][1] = "66"
+  actionTable[103][51][0] = "R"
+  actionTable[103][51][1] = "27"
 
-  actionTable[103][5][0] = "R"
-  actionTable[103][5][1] = "66"
+  actionTable[103][54][0] = "R"
+  actionTable[103][54][1] = "27"
 
-  actionTable[103][65][0] = "R"
-  actionTable[103][65][1] = "66"
+  actionTable[103][38][0] = "R"
+  actionTable[103][38][1] = "27"
 
-  actionTable[103][64][0] = "R"
-  actionTable[103][64][1] = "66"
+  actionTable[103][57][0] = "R"
+  actionTable[103][57][1] = "27"
 
-  actionTable[103][66][0] = "R"
-  actionTable[103][66][1] = "66"
+  #-------------State104------------
+  actionTable[104][13][0] = "R"
+  actionTable[104][13][1] = "31"
 
-  actionTable[103][63][0] = "R"
-  actionTable[103][63][1] = "66"
+  actionTable[104][2][0] = "R"
+  actionTable[104][2][1] = "31"
 
-  actionTable[104][67][0] = "R"
-  actionTable[104][67][1] = "67"
+  actionTable[104][4][0] = "R"
+  actionTable[104][4][1] = "31"
 
-  actionTable[104][3][0] = "R"
-  actionTable[104][3][1] = "67"
+  actionTable[104][41][0] = "R"
+  actionTable[104][41][1] = "31"
+
+  actionTable[104][40][0] = "R"
+  actionTable[104][40][1] = "31"
+
+  actionTable[104][25][0] = "R"
+  actionTable[104][25][1] = "31"
+
+  actionTable[104][24][0] = "R"
+  actionTable[104][24][1] = "31"
+
+  actionTable[104][20][0] = "R"
+  actionTable[104][20][1] = "31"
+
+  actionTable[104][22][0] = "R"
+  actionTable[104][22][1] = "31"
+
+  actionTable[104][21][0] = "R"
+  actionTable[104][21][1] = "31"
+
+  actionTable[104][23][0] = "R"
+  actionTable[104][23][1] = "31"
 
   actionTable[104][1][0] = "R"
-  actionTable[104][1][1] = "67"
+  actionTable[104][1][1] = "31"
 
   actionTable[104][39][0] = "R"
-  actionTable[104][39][1] = "67"
+  actionTable[104][39][1] = "31"
 
-  actionTable[104][61][0] = "R"
-  actionTable[104][61][1] = "67"
+  actionTable[104][9][0] = "R"
+  actionTable[104][9][1] = "31"
 
-  actionTable[104][5][0] = "R"
-  actionTable[104][5][1] = "67"
+  actionTable[104][11][0] = "R"
+  actionTable[104][11][1] = "31"
 
-  actionTable[104][65][0] = "R"
-  actionTable[104][65][1] = "67"
+  actionTable[104][10][0] = "R"
+  actionTable[104][10][1] = "31"
 
-  actionTable[104][64][0] = "R"
-  actionTable[104][64][1] = "67"
+  actionTable[104][6][0] = "R"
+  actionTable[104][6][1] = "31"
 
-  actionTable[104][66][0] = "R"
-  actionTable[104][66][1] = "67"
+  #-------------State105------------
+  actionTable[105][4][0] = "R"
+  actionTable[105][4][1] = "32"
 
-  actionTable[104][63][0] = "R"
-  actionTable[104][63][1] = "67"
+  actionTable[105][6][0] = "R"
+  actionTable[105][6][1] = "32"
 
-  actionTable[105][67][0] = "R"
-  actionTable[105][67][1] = "68"
+   #-------------State106------------
+  actionTable[106][67][0] = "D"
+  actionTable[106][67][1] = "65"
 
-  actionTable[105][3][0] = "R"
-  actionTable[105][3][1] = "68"
+  actionTable[106][3][0] = "D"
+  actionTable[106][3][1] = "69"
 
-  actionTable[105][1][0] = "R"
-  actionTable[105][1][1] = "68"
+  actionTable[106][1][0] = "D"
+  actionTable[106][1][1] = "62"
 
-  actionTable[105][39][0] = "R"
-  actionTable[105][39][1] = "68"
+  actionTable[106][39][0] = "D"
+  actionTable[106][39][1] = "63"
 
-  actionTable[105][61][0] = "R"
-  actionTable[105][61][1] = "68"
+  actionTable[106][61][0] = "D"
+  actionTable[106][61][1] = "64"
 
-  actionTable[105][5][0] = "R"
-  actionTable[105][5][1] = "68"
+  actionTable[106][5][0] = "D"
+  actionTable[106][5][1] = "70"
 
-  actionTable[105][65][0] = "R"
-  actionTable[105][65][1] = "68"
+  actionTable[106][65][0] = "D"
+  actionTable[106][65][1] = "71"
 
-  actionTable[105][64][0] = "R"
-  actionTable[105][64][1] = "68"
+  actionTable[106][64][0] = "D"
+  actionTable[106][64][1] = "72"
 
-  actionTable[105][66][0] = "R"
-  actionTable[105][66][1] = "68"
+  actionTable[106][66][0] = "D"
+  actionTable[106][66][1] = "73"
 
-  actionTable[105][63][0] = "R"
-  actionTable[105][63][1] = "68"
+  actionTable[106][63][0] = "D"
+  actionTable[106][63][1] = "74"
 
-  actionTable[106][69][0] = "R"
-  actionTable[106][69][1] = "69"
+  #-------------State107------------
+  actionTable[107][7][0] = "D"
+  actionTable[107][7][1] = "118"
 
-  actionTable[106][13][0] = "R"
-  actionTable[106][13][1] = "69"
+  #-------------State108------------
+  actionTable[108][13][0] = "R"
+  actionTable[108][13][1] = "41"
 
-  actionTable[106][2][0] = "R"
-  actionTable[106][2][1] = "69"
+  actionTable[108][67][0] = "R"
+  actionTable[108][67][1] = "41"
 
-  actionTable[106][4][0] = "R"
-  actionTable[106][4][1] = "69"
+  actionTable[108][8][0] = "R"
+  actionTable[108][8][1] = "41"
 
-  actionTable[106][41][0] = "R"
-  actionTable[106][41][1] = "69"
+  actionTable[108][49][0] = "R"
+  actionTable[108][49][1] = "41"
 
-  actionTable[106][40][0] = "R"
-  actionTable[106][40][1] = "69"
+  actionTable[108][50][0] = "R"
+  actionTable[108][50][1] = "41"
 
-  actionTable[106][25][0] = "R"
-  actionTable[106][25][1] = "69"
+  actionTable[108][51][0] = "R"
+  actionTable[108][51][1] = "41"
 
-  actionTable[106][24][0] = "R"
-  actionTable[106][24][1] = "69"
+  actionTable[108][54][0] = "R"
+  actionTable[108][54][1] = "41"
 
-  actionTable[106][20][0] = "R"
-  actionTable[106][20][1] = "69"
+  actionTable[108][38][0] = "R"
+  actionTable[108][38][1] = "41"
 
-  actionTable[106][22][0] = "R"
-  actionTable[106][22][1] = "69"
+  actionTable[108][57][0] = "R"
+  actionTable[108][57][1] = "41"
 
-  actionTable[106][21][0] = "R"
-  actionTable[106][21][1] = "69"
-
-  actionTable[106][23][0] = "R"
-  actionTable[106][23][1] = "69"
-
-  actionTable[106][1][0] = "R"
-  actionTable[106][1][1] = "69"
-
-  actionTable[106][39][0] = "R"
-  actionTable[106][39][1] = "69"
-
-  actionTable[106][9][0] = "R"
-  actionTable[106][9][1] = "69"
-
-  actionTable[106][11][0] = "R"
-  actionTable[106][11][1] = "69"
-
-  actionTable[106][10][0] = "R"
-  actionTable[106][10][1] = "69"
-
-  actionTable[107][4][0] = "D"
-  actionTable[107][4][1] = "122"
-
-  actionTable[108][6][0] = "D"
-  actionTable[108][6][1] = "123"
-
+  #-------------State109------------
   actionTable[109][13][0] = "R"
-  actionTable[109][13][1] = "27"
+  actionTable[109][13][1] = "46"
 
-  actionTable[109][67][0] = "R"
-  actionTable[109][67][1] = "27"
+  actionTable[109][2][0] = "R"
+  actionTable[109][2][1] = "46"
 
-  actionTable[109][8][0] = "R"
-  actionTable[109][8][1] = "27"
+  actionTable[109][4][0] = "R"
+  actionTable[109][4][1] = "46"
 
-  actionTable[109][49][0] = "R"
-  actionTable[109][49][1] = "27"
+  actionTable[109][41][0] = "R"
+  actionTable[109][41][1] = "46"
 
-  actionTable[109][50][0] = "R"
-  actionTable[109][50][1] = "27"
+  actionTable[109][40][0] = "D"
+  actionTable[109][40][1] = "84"
 
-  actionTable[109][51][0] = "R"
-  actionTable[109][51][1] = "27"
+  actionTable[109][6][0] = "R"
+  actionTable[109][6][1] = "46"
 
-  actionTable[109][54][0] = "R"
-  actionTable[109][54][1] = "27"
-
-  actionTable[109][38][0] = "R"
-  actionTable[109][38][1] = "27"
-
-  actionTable[109][57][0] = "R"
-  actionTable[109][57][1] = "27"
-
-  actionTable[110][69][0] = "R"
-  actionTable[110][69][1] = "31"
-
+  #-------------State110------------
   actionTable[110][13][0] = "R"
-  actionTable[110][13][1] = "31"
+  actionTable[110][13][1] = "48"
 
   actionTable[110][2][0] = "R"
-  actionTable[110][2][1] = "31"
+  actionTable[110][2][1] = "48"
 
   actionTable[110][4][0] = "R"
-  actionTable[110][4][1] = "31"
+  actionTable[110][4][1] = "48"
 
   actionTable[110][41][0] = "R"
-  actionTable[110][41][1] = "31"
+  actionTable[110][41][1] = "48"
 
   actionTable[110][40][0] = "R"
-  actionTable[110][40][1] = "31"
+  actionTable[110][40][1] = "48"
 
-  actionTable[110][25][0] = "R"
-  actionTable[110][25][1] = "31"
+  actionTable[110][25][0] = "D"
+  actionTable[110][25][1] = "86"
 
-  actionTable[110][24][0] = "R"
-  actionTable[110][24][1] = "31"
+  actionTable[110][24][0] = "D"
+  actionTable[110][24][1] = "87"
 
-  actionTable[110][20][0] = "R"
-  actionTable[110][20][1] = "31"
+  actionTable[110][6][0] = "R"
+  actionTable[110][6][1] = "48"
 
-  actionTable[110][22][0] = "R"
-  actionTable[110][22][1] = "31"
+  #-------------State111------------
+  actionTable[111][13][0] = "R"
+  actionTable[111][13][1] = "50"
 
-  actionTable[110][21][0] = "R"
-  actionTable[110][21][1] = "31"
-
-  actionTable[110][23][0] = "R"
-  actionTable[110][23][1] = "31"
-
-  actionTable[110][1][0] = "R"
-  actionTable[110][1][1] = "31"
-
-  actionTable[110][39][0] = "R"
-  actionTable[110][39][1] = "31"
-
-  actionTable[110][9][0] = "R"
-  actionTable[110][9][1] = "31"
-
-  actionTable[110][11][0] = "R"
-  actionTable[110][11][1] = "31"
-
-  actionTable[110][10][0] = "R"
-  actionTable[110][10][1] = "31"
+  actionTable[111][2][0] = "R"
+  actionTable[111][2][1] = "50"
 
   actionTable[111][4][0] = "R"
-  actionTable[111][4][1] = "32"
+  actionTable[111][4][1] = "50"
 
+  actionTable[111][41][0] = "R"
+  actionTable[111][41][1] = "50"
+
+  actionTable[111][40][0] = "R"
+  actionTable[111][40][1] = "50"
+
+  actionTable[111][25][0] = "R"
+  actionTable[111][25][1] = "50"
+
+  actionTable[111][24][0] = "R"
+  actionTable[111][24][1] = "50"
+
+  actionTable[111][20][0] = "D"
+  actionTable[111][20][1] = "89"
+
+  actionTable[111][22][0] = "D"
+  actionTable[111][22][1] = "90"
+
+  actionTable[111][21][0] = "D"
+  actionTable[111][21][1] = "91"
+
+  actionTable[111][23][0] = "D"
+  actionTable[111][23][1] = "92"
+  
   actionTable[111][6][0] = "R"
-  actionTable[111][6][1] = "32"
+  actionTable[111][6][1] = "50"
 
-  actionTable[112][67][0] = "D"
-  actionTable[112][67][1] = "70"
+  #-------------State112------------
+  actionTable[112][13][0] = "R"
+  actionTable[112][13][1] = "54"
 
-  actionTable[112][3][0] = "D"
-  actionTable[112][3][1] = "74"
+  actionTable[112][2][0] = "R"
+  actionTable[112][2][1] = "54"
+
+  actionTable[112][4][0] = "R"
+  actionTable[112][4][1] = "54"
+
+  actionTable[112][41][0] = "R"
+  actionTable[112][41][1] = "54"
+
+  actionTable[112][40][0] = "R"
+  actionTable[112][40][1] = "54"
+
+  actionTable[112][25][0] = "R"
+  actionTable[112][25][1] = "54"
+
+  actionTable[112][24][0] = "R"
+  actionTable[112][24][1] = "54"
+
+  actionTable[112][20][0] = "R"
+  actionTable[112][20][1] = "54"
+
+  actionTable[112][22][0] = "R"
+  actionTable[112][22][1] = "54"
+
+  actionTable[112][21][0] = "R"
+  actionTable[112][21][1] = "54"
+
+  actionTable[112][23][0] = "R"
+  actionTable[112][23][1] = "54"
 
   actionTable[112][1][0] = "D"
-  actionTable[112][1][1] = "67"
+  actionTable[112][1][1] = "94"
 
   actionTable[112][39][0] = "D"
-  actionTable[112][39][1] = "68"
+  actionTable[112][39][1] = "95"
+  
+  actionTable[112][6][0] = "R"
+  actionTable[112][6][1] = "54"
 
-  actionTable[112][61][0] = "D"
-  actionTable[112][61][1] = "69"
+  #-------------State113------------
+  actionTable[113][13][0] = "R"
+  actionTable[113][13][1] = "60"
 
-  actionTable[112][5][0] = "D"
-  actionTable[112][5][1] = "75"
-
-  actionTable[112][65][0] = "D"
-  actionTable[112][65][1] = "76"
-
-  actionTable[112][64][0] = "D"
-  actionTable[112][64][1] = "77"
-
-  actionTable[112][66][0] = "D"
-  actionTable[112][66][1] = "78"
-
-  actionTable[112][63][0] = "D"
-  actionTable[112][63][1] = "79"
+  actionTable[113][2][0] = "R"
+  actionTable[113][2][1] = "60"
 
   actionTable[113][4][0] = "R"
-  actionTable[113][4][1] = "35"
+  actionTable[113][4][1] = "60"
 
+  actionTable[113][41][0] = "R"
+  actionTable[113][41][1] = "60"
+
+  actionTable[113][40][0] = "R"
+  actionTable[113][40][1] = "60"
+
+  actionTable[113][25][0] = "R"
+  actionTable[113][25][1] = "60"
+
+  actionTable[113][24][0] = "R"
+  actionTable[113][24][1] = "60"
+
+  actionTable[113][20][0] = "R"
+  actionTable[113][20][1] = "60"
+
+  actionTable[113][22][0] = "R"
+  actionTable[113][22][1] = "60"
+
+  actionTable[113][21][0] = "R"
+  actionTable[113][21][1] = "60"
+
+  actionTable[113][23][0] = "R"
+  actionTable[113][23][1] = "60"
+
+  actionTable[113][1][0] = "R"
+  actionTable[113][1][1] = "60"
+
+  actionTable[113][39][0] = "R"
+  actionTable[113][39][1] = "60"
+
+  actionTable[113][9][0] = "D"
+  actionTable[113][9][1] = "97"
+
+  actionTable[113][11][0] = "D"
+  actionTable[113][11][1] = "98"
+
+  actionTable[113][10][0] = "D"
+  actionTable[113][10][1] = "99"
+  
   actionTable[113][6][0] = "R"
-  actionTable[113][6][1] = "35"
+  actionTable[113][6][1] = "60"
 
-  actionTable[114][7][0] = "D"
-  actionTable[114][7][1] = "125"
+    #-------------State114------------
+  actionTable[114][13][0] = "R"
+  actionTable[114][13][1] = "64"
 
+  actionTable[114][2][0] = "R"
+  actionTable[114][2][1] = "64"
+
+  actionTable[114][4][0] = "R"
+  actionTable[114][4][1] = "64"
+
+  actionTable[114][41][0] = "R"
+  actionTable[114][41][1] = "64"
+
+  actionTable[114][40][0] = "R"
+  actionTable[114][40][1] = "64"
+
+  actionTable[114][25][0] = "R"
+  actionTable[114][25][1] = "64"
+
+  actionTable[114][24][0] = "R"
+  actionTable[114][24][1] = "64"
+
+  actionTable[114][20][0] = "R"
+  actionTable[114][20][1] = "64"
+
+  actionTable[114][22][0] = "R"
+  actionTable[114][22][1] = "64"
+
+  actionTable[114][21][0] = "R"
+  actionTable[114][21][1] = "64"
+
+  actionTable[114][23][0] = "R"
+  actionTable[114][23][1] = "64"
+
+  actionTable[114][1][0] = "R"
+  actionTable[114][1][1] = "64"
+
+  actionTable[114][39][0] = "R"
+  actionTable[114][39][1] = "64"
+
+  actionTable[114][9][0] = "R"
+  actionTable[114][9][1] = "64"
+
+  actionTable[114][11][0] = "R"
+  actionTable[114][11][1] = "64"
+
+  actionTable[114][10][0] = "R"
+  actionTable[114][10][1] = "64"
+  
+  actionTable[114][6][0] = "R"
+  actionTable[114][6][1] = "64"
+
+  #-------------State115------------
   actionTable[115][13][0] = "R"
-  actionTable[115][13][1] = "41"
+  actionTable[115][13][1] = "78"
 
-  actionTable[115][67][0] = "R"
-  actionTable[115][67][1] = "41"
+  actionTable[115][2][0] = "R"
+  actionTable[115][2][1] = "78"
 
-  actionTable[115][8][0] = "R"
-  actionTable[115][8][1] = "41"
+  actionTable[115][4][0] = "R"
+  actionTable[115][4][1] = "78"
 
-  actionTable[115][49][0] = "R"
-  actionTable[115][49][1] = "41"
+  actionTable[115][41][0] = "R"
+  actionTable[115][41][1] = "78"
 
-  actionTable[115][50][0] = "R"
-  actionTable[115][50][1] = "41"
+  actionTable[115][40][0] = "R"
+  actionTable[115][40][1] = "78"
 
-  actionTable[115][51][0] = "R"
-  actionTable[115][51][1] = "41"
+  actionTable[115][25][0] = "R"
+  actionTable[115][25][1] = "78"
 
-  actionTable[115][54][0] = "R"
-  actionTable[115][54][1] = "41"
+  actionTable[115][24][0] = "R"
+  actionTable[115][24][1] = "78"
 
-  actionTable[115][38][0] = "R"
-  actionTable[115][38][1] = "41"
+  actionTable[115][20][0] = "R"
+  actionTable[115][20][1] = "78"
 
-  actionTable[115][57][0] = "R"
-  actionTable[115][57][1] = "41"
+  actionTable[115][22][0] = "R"
+  actionTable[115][22][1] = "78"
 
-  actionTable[116][69][0] = "R"
-  actionTable[116][69][1] = "46"
+  actionTable[115][21][0] = "R"
+  actionTable[115][21][1] = "78"
 
+  actionTable[115][23][0] = "R"
+  actionTable[115][23][1] = "78"
+
+  actionTable[115][1][0] = "R"
+  actionTable[115][1][1] = "78"
+
+  actionTable[115][39][0] = "R"
+  actionTable[115][39][1] = "78"
+
+  actionTable[115][9][0] = "R"
+  actionTable[115][9][1] = "78"
+
+  actionTable[115][11][0] = "R"
+  actionTable[115][11][1] = "78"
+
+  actionTable[115][10][0] = "R"
+  actionTable[115][10][1] = "78"
+  
+  actionTable[115][6][0] = "R"
+  actionTable[115][6][1] = "78"
+
+  #-------------State116------------
   actionTable[116][13][0] = "R"
-  actionTable[116][13][1] = "46"
+  actionTable[116][13][1] = "79"
 
   actionTable[116][2][0] = "R"
-  actionTable[116][2][1] = "46"
+  actionTable[116][2][1] = "79"
 
   actionTable[116][4][0] = "R"
-  actionTable[116][4][1] = "46"
+  actionTable[116][4][1] = "79"
 
   actionTable[116][41][0] = "R"
-  actionTable[116][41][1] = "46"
+  actionTable[116][41][1] = "79"
 
-  actionTable[116][40][0] = "D"
-  actionTable[116][40][1] = "90"
+  actionTable[116][40][0] = "R"
+  actionTable[116][40][1] = "79"
 
-  actionTable[117][69][0] = "R"
-  actionTable[117][69][1] = "48"
+  actionTable[116][25][0] = "R"
+  actionTable[116][25][1] = "79"
 
-  actionTable[117][13][0] = "R"
-  actionTable[117][13][1] = "48"
+  actionTable[116][24][0] = "R"
+  actionTable[116][24][1] = "79"
 
-  actionTable[117][2][0] = "R"
-  actionTable[117][2][1] = "48"
+  actionTable[116][20][0] = "R"
+  actionTable[116][20][1] = "79"
+
+  actionTable[116][22][0] = "R"
+  actionTable[116][22][1] = "79"
+
+  actionTable[116][21][0] = "R"
+  actionTable[116][21][1] = "79"
+
+  actionTable[116][23][0] = "R"
+  actionTable[116][23][1] = "79"
+
+  actionTable[116][1][0] = "R"
+  actionTable[116][1][1] = "79"
+
+  actionTable[116][39][0] = "R"
+  actionTable[116][39][1] = "79"
+
+  actionTable[116][9][0] = "R"
+  actionTable[116][9][1] = "79"
+
+  actionTable[116][11][0] = "R"
+  actionTable[116][11][1] = "79"
+
+  actionTable[116][10][0] = "R"
+  actionTable[116][10][1] = "79"
+  
+  actionTable[116][6][0] = "R"
+  actionTable[116][6][1] = "79"
+
+  #-------------State117------------
+  actionTable[117][2][0] = "D"
+  actionTable[117][2][1] = "106"
 
   actionTable[117][4][0] = "R"
-  actionTable[117][4][1] = "48"
-
-  actionTable[117][41][0] = "R"
-  actionTable[117][41][1] = "48"
-
-  actionTable[117][40][0] = "R"
-  actionTable[117][40][1] = "48"
-
-  actionTable[117][25][0] = "D"
-  actionTable[117][25][1] = "92"
-
-  actionTable[117][24][0] = "D"
-  actionTable[117][24][1] = "93"
-
-  actionTable[118][69][0] = "R"
-  actionTable[118][69][1] = "50"
-
-  actionTable[118][13][0] = "R"
-  actionTable[118][13][1] = "50"
-
-  actionTable[118][2][0] = "R"
-  actionTable[118][2][1] = "50"
-
-  actionTable[118][4][0] = "R"
-  actionTable[118][4][1] = "50"
-
-  actionTable[118][41][0] = "R"
-  actionTable[118][41][1] = "50"
-
-  actionTable[118][40][0] = "R"
-  actionTable[118][40][1] = "50"
-
-  actionTable[118][25][0] = "R"
-  actionTable[118][25][1] = "50"
-
-  actionTable[118][24][0] = "R"
-  actionTable[118][24][1] = "50"
-
-  actionTable[118][20][0] = "D"
-  actionTable[118][20][1] = "95"
-
-  actionTable[118][22][0] = "D"
-  actionTable[118][22][1] = "96"
-
-  actionTable[118][21][0] = "D"
-  actionTable[118][21][1] = "97"
-
-  actionTable[118][23][0] = "D"
-  actionTable[118][23][1] = "98"
-
-  actionTable[119][69][0] = "R"
-  actionTable[119][69][1] = "54"
-
-  actionTable[119][13][0] = "R"
-  actionTable[119][13][1] = "54"
-
-  actionTable[119][2][0] = "R"
-  actionTable[119][2][1] = "54"
-
-  actionTable[119][4][0] = "R"
-  actionTable[119][4][1] = "54"
-
-  actionTable[119][41][0] = "R"
-  actionTable[119][41][1] = "54"
-
-  actionTable[119][40][0] = "R"
-  actionTable[119][40][1] = "54"
-
-  actionTable[119][25][0] = "R"
-  actionTable[119][25][1] = "54"
-
-  actionTable[119][24][0] = "R"
-  actionTable[119][24][1] = "54"
-
-  actionTable[119][20][0] = "R"
-  actionTable[119][20][1] = "54"
-
-  actionTable[119][22][0] = "R"
-  actionTable[119][22][1] = "54"
-
-  actionTable[119][21][0] = "R"
-  actionTable[119][21][1] = "54"
-
-  actionTable[119][23][0] = "R"
-  actionTable[119][23][1] = "54"
-
-  actionTable[119][1][0] = "D"
-  actionTable[119][1][1] = "100"
-
-  actionTable[119][39][0] = "D"
-  actionTable[119][39][1] = "101"
-
-  actionTable[120][69][0] = "R"
-  actionTable[120][69][1] = "60"
-
-  actionTable[120][13][0] = "R"
-  actionTable[120][13][1] = "60"
-
-  actionTable[120][2][0] = "R"
-  actionTable[120][2][1] = "60"
-
-  actionTable[120][4][0] = "R"
-  actionTable[120][4][1] = "60"
-
-  actionTable[120][41][0] = "R"
-  actionTable[120][41][1] = "60"
-
-  actionTable[120][40][0] = "R"
-  actionTable[120][40][1] = "60"
-
-  actionTable[120][25][0] = "R"
-  actionTable[120][25][1] = "60"
-
-  actionTable[120][24][0] = "R"
-  actionTable[120][24][1] = "60"
-
-  actionTable[120][20][0] = "R"
-  actionTable[120][20][1] = "60"
-
-  actionTable[120][22][0] = "R"
-  actionTable[120][22][1] = "60"
-
-  actionTable[120][21][0] = "R"
-  actionTable[120][21][1] = "60"
-
-  actionTable[120][23][0] = "R"
-  actionTable[120][23][1] = "60"
-
-  actionTable[120][1][0] = "R"
-  actionTable[120][1][1] = "60"
-
-  actionTable[120][39][0] = "R"
-  actionTable[120][39][1] = "60"
-
-  actionTable[120][9][0] = "D"
-  actionTable[120][9][1] = "103"
-
-  actionTable[120][11][0] = "D"
-  actionTable[120][11][1] = "104"
-
-  actionTable[120][10][0] = "D"
-  actionTable[120][10][1] = "105"
-
-  actionTable[121][69][0] = "R"
-  actionTable[121][69][1] = "64"
-
-  actionTable[121][13][0] = "R"
-  actionTable[121][13][1] = "64"
+  actionTable[117][4][1] = "35"
   
-  actionTable[121][2][0] = "R"
-  actionTable[121][2][1] = "64"
+  actionTable[117][6][0] = "R"
+  actionTable[117][6][1] = "35"
 
-  actionTable[121][4][0] = "R"
-  actionTable[121][4][1] = "64"
+  #-------------State118------------
+  actionTable[118][13][0] = "R"
+  actionTable[118][13][1] = "17"
 
-  actionTable[121][41][0] = "R"
-  actionTable[121][41][1] = "64"
+  actionTable[118][67][0] = "R"
+  actionTable[118][67][1] = "17"
 
-  actionTable[121][40][0] = "R"
-  actionTable[121][40][1] = "64"
+  actionTable[118][8][0] = "R"
+  actionTable[118][8][1] = "17"
 
-  actionTable[121][25][0] = "R"
-  actionTable[121][25][1] = "64"
+  actionTable[118][49][0] = "R"
+  actionTable[118][49][1] = "17"
 
-  actionTable[121][24][0] = "R"
-  actionTable[121][24][1] = "64"
+  actionTable[118][50][0] = "R"
+  actionTable[118][50][1] = "17"
 
-  actionTable[121][20][0] = "R"
-  actionTable[121][20][1] = "64"
+  actionTable[118][51][0] = "R"
+  actionTable[118][51][1] = "17"
 
-  actionTable[121][22][0] = "R"
-  actionTable[121][22][1] = "64"
+  actionTable[118][54][0] = "R"
+  actionTable[118][54][1] = "17"
 
-  actionTable[121][21][0] = "R"
-  actionTable[121][21][1] = "64"
+  actionTable[118][38][0] = "R"
+  actionTable[118][38][1] = "17"
 
-  actionTable[121][23][0] = "R"
-  actionTable[121][23][1] = "64"
+  actionTable[118][57][0] = "R"
+  actionTable[118][57][1] = "17"
 
-  actionTable[121][1][0] = "R"
-  actionTable[121][1][1] = "64"
+  #-------------State119------------
+  actionTable[119][4][0] = "R"
+  actionTable[119][4][1] = "34"
 
-  actionTable[121][39][0] = "R"
-  actionTable[121][39][1] = "64"
+  actionTable[119][6][0] = "R"
+  actionTable[119][6][1] = "34"
 
-  actionTable[121][9][0] = "R"
-  actionTable[121][9][1] = "64"
+  #-------------State120------------
+  actionTable[120][13][0] = "D"
+  actionTable[120][13][1] = "43"
 
-  actionTable[121][11][0] = "R"
-  actionTable[121][11][1] = "64"
+  actionTable[120][67][0] = "D"
+  actionTable[120][67][1] = "35"
 
-  actionTable[121][10][0] = "R"
-  actionTable[121][10][1] = "64"
+  actionTable[120][8][0] = "D"
+  actionTable[120][8][1] = "121"
 
-  actionTable[122][69][0] = "R"
-  actionTable[122][69][1] = "78"
+  actionTable[120][49][0] = "D"
+  actionTable[120][49][1] = "36"
 
+  actionTable[120][50][0] = "D"
+  actionTable[120][50][1] = "37"
+
+  actionTable[120][51][0] = "D"
+  actionTable[120][51][1] = "39"
+
+  actionTable[120][54][0] = "D"
+  actionTable[120][54][1] = "40"
+
+  actionTable[120][38][0] = "D"
+  actionTable[120][38][1] = "41"
+
+  actionTable[120][57][0] = "D"
+  actionTable[120][57][1] = "42"
+
+  #-------------State121------------
+  actionTable[121][13][0] = "R"
+  actionTable[121][13][1] = "38"
+
+  actionTable[121][67][0] = "R"
+  actionTable[121][67][1] = "38"
+
+  actionTable[121][8][0] = "R"
+  actionTable[121][8][1] = "38"
+
+  actionTable[121][49][0] = "R"
+  actionTable[121][49][1] = "38"
+
+  actionTable[121][50][0] = "R"
+  actionTable[121][50][1] = "38"
+
+  actionTable[121][51][0] = "R"
+  actionTable[121][51][1] = "38"
+
+  actionTable[121][53][0] = "R"
+  actionTable[121][53][1] = "38"
+
+  actionTable[121][52][0] = "R"
+  actionTable[121][52][1] = "38"
+
+  actionTable[121][38][0] = "R"
+  actionTable[121][38][1] = "38"
+
+  actionTable[121][57][0] = "R"
+  actionTable[121][57][1] = "38"
+
+  #-------------State122------------
   actionTable[122][13][0] = "R"
-  actionTable[122][13][1] = "78"
+  actionTable[122][13][1] = "40"
 
-  actionTable[122][2][0] = "R"
-  actionTable[122][2][1] = "78"
+  actionTable[122][67][0] = "R"
+  actionTable[122][67][1] = "40"
 
-  actionTable[122][4][0] = "R"
-  actionTable[122][4][1] = "78"
+  actionTable[122][8][0] = "R"
+  actionTable[122][8][1] = "40"
 
-  actionTable[122][41][0] = "R"
-  actionTable[122][41][1] = "78"
+  actionTable[122][49][0] = "R"
+  actionTable[122][49][1] = "40"
 
-  actionTable[122][40][0] = "R"
-  actionTable[122][40][1] = "78"
+  actionTable[122][50][0] = "R"
+  actionTable[122][50][1] = "40"
 
-  actionTable[122][25][0] = "R"
-  actionTable[122][25][1] = "78"
+  actionTable[122][51][0] = "R"
+  actionTable[122][51][1] = "40"
 
-  actionTable[122][24][0] = "R"
-  actionTable[122][24][1] = "78"
+  actionTable[122][53][0] = "D"
+  actionTable[122][53][1] = "124"
 
-  actionTable[122][20][0] = "R"
-  actionTable[122][20][1] = "78"
+  actionTable[122][52][0] = "D"
+  actionTable[122][52][1] = "125"
 
-  actionTable[122][22][0] = "R"
-  actionTable[122][22][1] = "78"
+  actionTable[122][38][0] = "R"
+  actionTable[122][38][1] = "40"
 
-  actionTable[122][21][0] = "R"
-  actionTable[122][21][1] = "78"
+  actionTable[122][57][0] = "R"
+  actionTable[122][57][1] = "40"
 
-  actionTable[122][23][0] = "R"
-  actionTable[122][23][1] = "78"
-
-  actionTable[122][1][0] = "R"
-  actionTable[122][1][1] = "78"
-
-  actionTable[122][39][0] = "R"
-  actionTable[122][39][1] = "78"
-
-  actionTable[122][9][0] = "R"
-  actionTable[122][9][1] = "78"
-
-  actionTable[122][11][0] = "R"
-  actionTable[122][11][1] = "78"
-
-  actionTable[122][10][0] = "R"
-  actionTable[122][10][1] = "78"
-
-  actionTable[123][69][0] = "R"
-  actionTable[123][69][1] = "79"
-
+  #-------------State123------------
   actionTable[123][13][0] = "R"
-  actionTable[123][13][1] = "79"
+  actionTable[123][13][1] = "36"
 
-  actionTable[123][2][0] = "R"
-  actionTable[123][2][1] = "79"
+  actionTable[123][67][0] = "R"
+  actionTable[123][67][1] = "36"
 
-  actionTable[123][4][0] = "R"
-  actionTable[123][4][1] = "79"
+  actionTable[123][8][0] = "R"
+  actionTable[123][8][1] = "36"
 
-  actionTable[123][41][0] = "R"
-  actionTable[123][41][1] = "79"
+  actionTable[123][49][0] = "R"
+  actionTable[123][49][1] = "36"
 
-  actionTable[123][40][0] = "R"
-  actionTable[123][40][1] = "79"
+  actionTable[123][50][0] = "R"
+  actionTable[123][50][1] = "36"
 
-  actionTable[123][25][0] = "R"
-  actionTable[123][25][1] = "79"
+  actionTable[123][51][0] = "R"
+  actionTable[123][51][1] = "36"
 
-  actionTable[123][24][0] = "R"
-  actionTable[123][24][1] = "79"
+  actionTable[123][54][0] = "R"
+  actionTable[123][54][1] = "36"
 
-  actionTable[123][20][0] = "R"
-  actionTable[123][20][1] = "79"
+  actionTable[123][38][0] = "R"
+  actionTable[123][38][1] = "36"
 
-  actionTable[123][22][0] = "R"
-  actionTable[123][22][1] = "79"
+  actionTable[123][57][0] = "R"
+  actionTable[123][57][1] = "36"
 
-  actionTable[123][21][0] = "R"
-  actionTable[123][21][1] = "79"
+  #-------------State124------------
+  actionTable[124][3][0] = "D"
+  actionTable[124][3][1] = "126"
 
-  actionTable[123][23][0] = "R"
-  actionTable[123][23][1] = "79"
+  #-------------State125------------
+  actionTable[125][7][0] = "D"
+  actionTable[125][7][1] = "127"
 
-  actionTable[123][1][0] = "R"
-  actionTable[123][1][1] = "79"
+   #-------------State126------------
+  actionTable[126][67][0] = "D"
+  actionTable[126][67][1] = "65"
 
-  actionTable[123][39][0] = "R"
-  actionTable[123][39][1] = "79"
+  actionTable[126][3][0] = "D"
+  actionTable[126][3][1] = "69"
 
-  actionTable[123][9][0] = "R"
-  actionTable[123][9][1] = "79"
+  actionTable[126][1][0] = "D"
+  actionTable[126][1][1] = "62"
 
-  actionTable[123][11][0] = "R"
-  actionTable[123][11][1] = "79"
+  actionTable[126][39][0] = "D"
+  actionTable[126][39][1] = "63"
 
-  actionTable[123][10][0] = "R"
-  actionTable[123][10][1] = "79"
+  actionTable[126][61][0] = "D"
+  actionTable[126][61][1] = "64"
 
-  actionTable[124][69][0] = "D"
-  actionTable[124][69][1] = "113"
+  actionTable[126][5][0] = "D"
+  actionTable[126][5][1] = "70"
 
-  actionTable[124][69][0] = "D"
-  actionTable[124][69][1] = "113"
+  actionTable[126][65][0] = "D"
+  actionTable[126][65][1] = "71"
 
-  actionTable[124][2][0] = "D"
-  actionTable[124][2][1] = "112"
+  actionTable[126][64][0] = "D"
+  actionTable[126][64][1] = "72"
 
-  actionTable[125][69][0] = "D"
-  actionTable[125][69][1] = "28"
+  actionTable[126][66][0] = "D"
+  actionTable[126][66][1] = "73"
 
-  actionTable[126][4][0] = "R"
-  actionTable[126][4][1] = "34"
+  actionTable[126][63][0] = "D"
+  actionTable[126][63][1] = "74"
 
-  actionTable[126][6][0] = "R"
-  actionTable[126][6][1] = "34"
+  #-------------State127------------
+  actionTable[127][13][0] = "R"
+  actionTable[127][13][1] = "17"
 
-  actionTable[127][13][0] = "D"
-  actionTable[127][13][1] = "48"
+  actionTable[127][67][0] = "R"
+  actionTable[127][67][1] = "17"
 
-  actionTable[127][67][0] = "D"
-  actionTable[127][67][1] = "40"
+  actionTable[127][8][0] = "R"
+  actionTable[127][8][1] = "17"
 
-  actionTable[127][8][0] = "D"
-  actionTable[127][8][1] = "128"
+  actionTable[127][49][0] = "R"
+  actionTable[127][49][1] = "17"
 
-  actionTable[127][49][0] = "D"
-  actionTable[127][49][1] = "41"
+  actionTable[127][50][0] = "R"
+  actionTable[127][50][1] = "17"
 
-  actionTable[127][50][0] = "D"
-  actionTable[127][50][1] = "42"
+  actionTable[127][51][0] = "R"
+  actionTable[127][51][1] = "17"
 
-  actionTable[127][51][0] = "D"
-  actionTable[127][51][0] = "44"
+  actionTable[127][54][0] = "R"
+  actionTable[127][54][1] = "17"
 
-  actionTable[127][54][0] = "D"
-  actionTable[127][54][1] = "45"
+  actionTable[127][38][0] = "R"
+  actionTable[127][38][1] = "17"
 
-  actionTable[127][38][0] = "D"
-  actionTable[127][38][1] = "46"
+  actionTable[127][57][0] = "R"
+  actionTable[127][57][1] = "17"
 
-  actionTable[127][57][0] = "D"
-  actionTable[127][57][1] = "47"
+  #-------------State128------------
+  actionTable[128][4][0] = "D"
+  actionTable[128][4][1] = "130"
 
-  actionTable[128][69][0] = "D"
-  actionTable[128][69][1] = "130"
+  #-------------State129------------
+  actionTable[129][13][0] = "D"
+  actionTable[129][13][1] = "43"
 
-  actionTable[129][69][0] = "D"
-  actionTable[129][69][1] = "134"
+  actionTable[129][67][0] = "D"
+  actionTable[129][67][1] = "35"
 
-  actionTable[129][53][0] = "D"
-  actionTable[129][53][1] = "132"
+  actionTable[129][8][0] = "D"
+  actionTable[129][8][1] = "131"
 
-  actionTable[129][52][0] = "D"
-  actionTable[129][52][1] = "133"
+  actionTable[129][49][0] = "D"
+  actionTable[129][49][1] = "36"
 
-  actionTable[130][69][0] = "R"
-  actionTable[130][69][1] = "38"
+  actionTable[129][50][0] = "D"
+  actionTable[129][50][1] = "37"
 
-  actionTable[130][53][0] = "R"
-  actionTable[130][53][1] = "38"
+  actionTable[129][51][0] = "D"
+  actionTable[129][51][1] = "39"
 
-  actionTable[130][52][0] = "R"
-  actionTable[130][52][1] = "38"
+  actionTable[129][54][0] = "D"
+  actionTable[129][54][1] = "40"
 
+  actionTable[129][38][0] = "D"
+  actionTable[129][38][1] = "41"
+
+  actionTable[129][57][0] = "D"
+  actionTable[129][57][1] = "42"
+
+  #-------------State130------------
+  actionTable[130][13][0] = "D"
+  actionTable[130][13][1] = "132"
+
+  #-------------State131------------
   actionTable[131][13][0] = "R"
-  actionTable[131][13][1] = "36"
+  actionTable[131][13][1] = "39"
 
   actionTable[131][67][0] = "R"
-  actionTable[131][67][1] = "36"
+  actionTable[131][67][1] = "39"
 
   actionTable[131][8][0] = "R"
-  actionTable[131][8][1] = "36"
+  actionTable[131][8][1] = "39"
 
   actionTable[131][49][0] = "R"
-  actionTable[131][49][1] = "36"
+  actionTable[131][49][1] = "39"
 
   actionTable[131][50][0] = "R"
-  actionTable[131][50][1] = "36"
+  actionTable[131][50][1] = "39"
 
   actionTable[131][51][0] = "R"
-  actionTable[131][51][1] = "36"
+  actionTable[131][51][1] = "39"
 
   actionTable[131][54][0] = "R"
-  actionTable[131][54][1] = "36"
+  actionTable[131][54][1] = "39"
 
   actionTable[131][38][0] = "R"
-  actionTable[131][38][1] = "36"
+  actionTable[131][38][1] = "39"
 
   actionTable[131][57][0] = "R"
-  actionTable[131][57][1] = "36"
+  actionTable[131][57][1] = "39"
 
-  actionTable[132][3][0] = "D"
-  actionTable[132][3][1] = "135"
+  #-------------State132------------
+  actionTable[132][13][0] = "R"
+  actionTable[132][13][1] = "17"
 
-  actionTable[133][7][0] = "D"
-  actionTable[133][7][1] = "136"
+  actionTable[132][67][0] = "R"
+  actionTable[132][67][1] = "17"
 
+  actionTable[132][8][0] = "R"
+  actionTable[132][8][1] = "17"
+
+  actionTable[132][49][0] = "R"
+  actionTable[132][49][1] = "17"
+
+  actionTable[132][50][0] = "R"
+  actionTable[132][50][1] = "17"
+
+  actionTable[132][51][0] = "R"
+  actionTable[132][51][1] = "17"
+
+  actionTable[132][54][0] = "R"
+  actionTable[132][54][1] = "17"
+
+  actionTable[132][38][0] = "R"
+  actionTable[132][38][1] = "17"
+
+  actionTable[132][57][0] = "R"
+  actionTable[132][57][1] = "17"
+
+  #-------------State133------------
+  actionTable[133][13][0] = "D"
+  actionTable[133][13][1] = "43"
+
+  actionTable[133][67][0] = "D"
+  actionTable[133][67][1] = "35"
+
+  actionTable[133][8][0] = "D"
+  actionTable[133][8][1] = "134"
+
+  actionTable[133][49][0] = "D"
+  actionTable[133][49][1] = "36"
+
+  actionTable[133][50][0] = "D"
+  actionTable[133][50][1] = "37"
+
+  actionTable[133][51][0] = "D"
+  actionTable[133][51][1] = "39"
+
+  actionTable[133][54][0] = "D"
+  actionTable[133][54][1] = "40"
+
+  actionTable[133][38][0] = "D"
+  actionTable[133][38][1] = "41"
+
+  actionTable[133][57][0] = "D"
+  actionTable[133][57][1] = "42"
+
+  #-------------State134------------
   actionTable[134][13][0] = "R"
-  actionTable[134][13][1] = "40"
+  actionTable[134][13][1] = "37"
 
   actionTable[134][67][0] = "R"
-  actionTable[134][67][1] = "40"
-
-  actionTable[134][67][0] = "R"
-  actionTable[134][67][1] = "40"
+  actionTable[134][67][1] = "37"
 
   actionTable[134][8][0] = "R"
-  actionTable[134][8][1] = "40"
+  actionTable[134][8][1] = "37"
 
   actionTable[134][49][0] = "R"
-  actionTable[134][49][1] = "40"
+  actionTable[134][49][1] = "37"
 
   actionTable[134][50][0] = "R"
-  actionTable[134][50][1] = "40"
+  actionTable[134][50][1] = "37"
 
   actionTable[134][51][0] = "R"
-  actionTable[134][51][1] = "40"
+  actionTable[134][51][1] = "37"
 
-  actionTable[134][54][0] = "R"
-  actionTable[134][54][1] = "40"
+  actionTable[134][53][0] = "R"
+  actionTable[134][53][1] = "37"
+
+  actionTable[134][52][0] = "R"
+  actionTable[134][52][1] = "37"
 
   actionTable[134][38][0] = "R"
-  actionTable[134][38][1] = "40"
-  
+  actionTable[134][38][1] = "37"
+
   actionTable[134][57][0] = "R"
-  actionTable[134][57][1] = "40"
+  actionTable[134][57][1] = "37"
+  # --------- Jesus ------------
+  actionTable[61][13][0] = "R"
+  actionTable[61][13][1] = "70"
+  actionTable[61][2][0] = "R"
+  actionTable[61][2][1] = "70"
+  actionTable[61][4][0] = "R"
+  actionTable[61][4][1] = "70"
+  actionTable[61][41][0] = "R"
+  actionTable[61][41][1] = "70"
+  actionTable[61][40][0] = "R"
+  actionTable[61][40][1] = "70"
+  actionTable[61][25][0] = "R"
+  actionTable[61][25][1] = "70"
+  actionTable[61][24][0] = "R"
+  actionTable[61][24][1] = "70"
+  actionTable[61][20][0] = "R"
+  actionTable[61][20][1] = "70"
+  actionTable[61][22][0] = "R"
+  actionTable[61][22][1] = "70"
+  actionTable[61][21][0] = "R"
+  actionTable[61][21][1] = "70"
+  actionTable[61][23][0] = "R"
+  actionTable[61][23][1] = "70"
+  actionTable[61][1][0] = "R"
+  actionTable[61][1][1] = "70"
+  actionTable[61][39][0] = "R"
+  actionTable[61][39][1] = "70"
+  actionTable[61][9][0] = "R"
+  actionTable[61][9][1] = "70"
+  actionTable[61][11][0] = "R"
+  actionTable[61][11][1] = "70"
+  actionTable[61][10][0] = "R"
+  actionTable[61][10][1] = "70"
+  actionTable[61][6][0] = "R"
+  actionTable[61][6][1] = "70"
+  
+  actionTable[62][67][0] = "R"
+  actionTable[62][67][1] = "71"
+  actionTable[62][3][0] = "R"
+  actionTable[62][3][1] = "71"
+  actionTable[62][1][0] = "R"
+  actionTable[62][1][1] = "71"
+  actionTable[62][39][0] = "R"
+  actionTable[62][39][1] = "71"
+  actionTable[62][61][0] = "R"
+  actionTable[62][61][1] = "71"
+  actionTable[62][5][0] = "R"
+  actionTable[62][5][1] = "71"
+  actionTable[62][65][0] = "R"
+  actionTable[62][65][1] = "71"
+  actionTable[62][64][0] = "R"
+  actionTable[62][64][1] = "71"
+  actionTable[62][66][0] = "R"
+  actionTable[62][66][1] = "71"
+  actionTable[62][63][0] = "R"
+  actionTable[62][63][1] = "71"
 
-  actionTable[135][67][0] = "D"
-  actionTable[135][67][1] = "70"
+  actionTable[63][67][0] = "R"
+  actionTable[63][67][1] = "72"
+  actionTable[63][3][0] = "R"
+  actionTable[63][3][1] = "72"
+  actionTable[63][1][0] = "R"
+  actionTable[63][1][1] = "72"
+  actionTable[63][39][0] = "R"
+  actionTable[63][39][1] = "72"
+  actionTable[63][61][0] = "R"
+  actionTable[63][61][1] = "72"
+  actionTable[63][5][0] = "R"
+  actionTable[63][5][1] = "72"
+  actionTable[63][65][0] = "R"
+  actionTable[63][65][1] = "72"
+  actionTable[63][64][0] = "R"
+  actionTable[63][64][1] = "72"
+  actionTable[63][66][0] = "R"
+  actionTable[63][66][1] = "72"
+  actionTable[63][63][0] = "R"
+  actionTable[63][63][1] = "72"
 
-  actionTable[135][3][0] = "D"
-  actionTable[135][3][1] = "74"
+  actionTable[64][67][0] = "R"
+  actionTable[64][67][1] = "73"
+  actionTable[64][3][0] = "R"
+  actionTable[64][3][1] = "73"
+  actionTable[64][1][0] = "R"
+  actionTable[64][1][1] = "73"
+  actionTable[64][39][0] = "R"
+  actionTable[64][39][1] = "73"
+  actionTable[64][61][0] = "R"
+  actionTable[64][61][1] = "73"
+  actionTable[64][5][0] = "R"
+  actionTable[64][5][1] = "73"
+  actionTable[64][65][0] = "R"
+  actionTable[64][65][1] = "73"
+  actionTable[64][64][0] = "R"
+  actionTable[64][64][1] = "73"
+  actionTable[64][66][0] = "R"
+  actionTable[64][66][1] = "73"
+  actionTable[64][63][0] = "R"
+  actionTable[64][63][1] = "73"
+  
+  actionTable[65][13][0] = "R"
+  actionTable[65][13][1] = "74"
+  actionTable[65][2][0] = "R"
+  actionTable[65][2][1] = "74"
+  actionTable[65][3][0] = "D"
+  actionTable[65][3][1] = "45"
+  actionTable[65][4][0] = "R"
+  actionTable[65][4][1] = "74"
+  actionTable[65][41][0] = "R"
+  actionTable[65][41][1] = "74"
+  actionTable[65][40][0] = "R"
+  actionTable[65][40][1] = "74"
+  actionTable[65][25][0] = "R"
+  actionTable[65][25][1] = "74"
+  actionTable[65][24][0] = "R"
+  actionTable[65][24][1] = "74"
+  actionTable[65][20][0] = "R"
+  actionTable[65][20][1] = "74"
+  actionTable[65][22][0] = "R"
+  actionTable[65][22][1] = "74"
+  actionTable[65][21][0] = "R"
+  actionTable[65][21][1] = "74"
+  actionTable[65][23][0] = "R"
+  actionTable[65][23][1] = "74"
+  actionTable[65][1][0] = "R"
+  actionTable[65][1][1] = "74"
+  actionTable[65][39][0] = "R"
+  actionTable[65][39][1] = "74"
+  actionTable[65][9][0] = "R"
+  actionTable[65][9][1] = "74"
+  actionTable[65][11][0] = "R"
+  actionTable[65][11][1] = "74"
+  actionTable[65][10][0] = "R"
+  actionTable[65][10][1] = "74"
+  actionTable[65][6][0] = "R"
+  actionTable[65][6][1] = "74"
 
-  actionTable[135][1][0] = "D"
-  actionTable[135][1][1] = "67"
+  actionTable[66][13][0] = "R"
+  actionTable[66][13][1] = "75"
+  actionTable[66][2][0] = "R"
+  actionTable[66][2][1] = "75"
+  actionTable[66][4][0] = "R"
+  actionTable[66][4][1] = "75"
+  actionTable[66][41][0] = "R"
+  actionTable[66][41][1] = "75"
+  actionTable[66][40][0] = "R"
+  actionTable[66][40][1] = "75"
+  actionTable[66][25][0] = "R"
+  actionTable[66][25][1] = "75"
+  actionTable[66][24][0] = "R"
+  actionTable[66][24][1] = "75"
+  actionTable[66][20][0] = "R"
+  actionTable[66][20][1] = "75"
+  actionTable[66][22][0] = "R"
+  actionTable[66][22][1] = "75"
+  actionTable[66][21][0] = "R"
+  actionTable[66][21][1] = "75"
+  actionTable[66][23][0] = "R"
+  actionTable[66][23][1] = "75"
+  actionTable[66][1][0] = "R"
+  actionTable[66][1][1] = "75"
+  actionTable[66][39][0] = "R"
+  actionTable[66][39][1] = "75"
+  actionTable[66][9][0] = "R"
+  actionTable[66][9][1] = "75"
+  actionTable[66][11][0] = "R"
+  actionTable[66][11][1] = "75"
+  actionTable[66][10][0] = "R"
+  actionTable[66][10][1] = "75"
+  actionTable[66][6][0] = "R"
+  actionTable[66][6][1] = "75"
 
-  actionTable[135][39][0] = "D"
-  actionTable[135][39][1] = "68"
+  actionTable[67][13][0] = "R"
+  actionTable[67][13][1] = "76"
+  actionTable[67][2][0] = "R"
+  actionTable[67][2][1] = "76"
+  actionTable[67][4][0] = "R"
+  actionTable[67][4][1] = "76"
+  actionTable[67][41][0] = "R"
+  actionTable[67][41][1] = "76"
+  actionTable[67][40][0] = "R"
+  actionTable[67][40][1] = "76"
+  actionTable[67][25][0] = "R"
+  actionTable[67][25][1] = "76"
+  actionTable[67][24][0] = "R"
+  actionTable[67][24][1] = "76"
+  actionTable[67][20][0] = "R"
+  actionTable[67][20][1] = "76"
+  actionTable[67][22][0] = "R"
+  actionTable[67][22][1] = "76"
+  actionTable[67][21][0] = "R"
+  actionTable[67][21][1] = "76"
+  actionTable[67][23][0] = "R"
+  actionTable[67][23][1] = "76"
+  actionTable[67][1][0] = "R"
+  actionTable[67][1][1] = "76"
+  actionTable[67][39][0] = "R"
+  actionTable[67][39][1] = "76"
+  actionTable[67][9][0] = "R"
+  actionTable[67][9][1] = "76"
+  actionTable[67][11][0] = "R"
+  actionTable[67][11][1] = "76"
+  actionTable[67][10][0] = "R"
+  actionTable[67][10][1] = "76"
+  actionTable[67][6][0] = "R"
+  actionTable[67][6][1] = "76"
+  
+  actionTable[68][13][0] = "R"
+  actionTable[68][13][1] = "77"
+  actionTable[68][2][0] = "R"
+  actionTable[68][2][1] = "77"
+  actionTable[68][4][0] = "R"
+  actionTable[68][4][1] = "77"
+  actionTable[68][41][0] = "R"
+  actionTable[68][41][1] = "77"
+  actionTable[68][40][0] = "R"
+  actionTable[68][40][1] = "77"
+  actionTable[68][25][0] = "R"
+  actionTable[68][25][1] = "77"
+  actionTable[68][24][0] = "R"
+  actionTable[68][24][1] = "77"
+  actionTable[68][20][0] = "R"
+  actionTable[68][20][1] = "77"
+  actionTable[68][22][0] = "R"
+  actionTable[68][22][1] = "77"
+  actionTable[68][21][0] = "R"
+  actionTable[68][21][1] = "77"
+  actionTable[68][23][0] = "R"
+  actionTable[68][23][1] = "77"
+  actionTable[68][1][0] = "R"
+  actionTable[68][1][1] = "77"
+  actionTable[68][39][0] = "R"
+  actionTable[68][39][1] = "77"
+  actionTable[68][9][0] = "R"
+  actionTable[68][9][1] = "77"
+  actionTable[68][11][0] = "R"
+  actionTable[68][11][1] = "77"
+  actionTable[68][10][0] = "R"
+  actionTable[68][10][1] = "77"
+  actionTable[68][6][0] = "R"
+  actionTable[68][6][1] = "77"
 
-  actionTable[135][61][0] = "D"
-  actionTable[135][61][1] = "69"
+  actionTable[69][67][0] = "D"
+  actionTable[69][67][1] = "65"
+  actionTable[69][3][0] = "D"
+  actionTable[69][3][1] = "69"
+  actionTable[69][1][0] = "D"
+  actionTable[69][1][1] = "62"
+  actionTable[69][39][0] = "D"
+  actionTable[69][39][1] = "63"
+  actionTable[69][61][0] = "D"
+  actionTable[69][61][1] = "64"
+  actionTable[69][5][0] = "D"
+  actionTable[69][5][1] = "70"
+  actionTable[69][65][0] = "D"
+  actionTable[69][65][1] = "71"
+  actionTable[69][64][0] = "D"
+  actionTable[69][64][1] = "72"
+  actionTable[69][66][0] = "D"
+  actionTable[69][66][1] = "73"
+  actionTable[69][63][0] = "D"
+  actionTable[69][63][1] = "74"
 
-  actionTable[135][5][0] = "D"
-  actionTable[135][5][1] = "75"
+  actionTable[70][67][0] = "D"
+  actionTable[70][67][1] = "65"
+  actionTable[70][3][0] = "D"
+  actionTable[70][3][1] = "69"
+  actionTable[70][4][0] = "R"
+  actionTable[70][4][1] = "33"
+  actionTable[70][1][0] = "D"
+  actionTable[70][1][1] = "62"
+  actionTable[70][39][0] = "D"
+  actionTable[70][39][1] = "63"
+  actionTable[70][61][0] = "D"
+  actionTable[70][61][1] = "64"
+  actionTable[70][5][0] = "D"
+  actionTable[70][5][1] = "70"
+  actionTable[70][6][0] = "R"
+  actionTable[70][6][1] = "33"
+  actionTable[70][65][0] = "D"
+  actionTable[70][65][1] = "71"
+  actionTable[70][64][0] = "D"
+  actionTable[70][64][1] = "72"
+  actionTable[70][66][0] = "D"
+  actionTable[70][66][1] = "73"
+  actionTable[70][63][0] = "D"
+  actionTable[70][63][1] = "74"
 
-  actionTable[135][65][0] = "D"
-  actionTable[135][65][1] = "76"
+  actionTable[71][13][0] = "R"
+  actionTable[71][13][1] = "80"
+  actionTable[71][2][0] = "R"
+  actionTable[71][2][1] = "80"
+  actionTable[71][4][0] = "R"
+  actionTable[71][4][1] = "80"
+  actionTable[71][41][0] = "R"
+  actionTable[71][41][1] = "80"
+  actionTable[71][40][0] = "R"
+  actionTable[71][40][1] = "80"
+  actionTable[71][25][0] = "R"
+  actionTable[71][25][1] = "80"
+  actionTable[71][24][0] = "R"
+  actionTable[71][24][1] = "80"
+  actionTable[71][20][0] = "R"
+  actionTable[71][20][1] = "80"
+  actionTable[71][22][0] = "R"
+  actionTable[71][22][1] = "80"
+  actionTable[71][21][0] = "R"
+  actionTable[71][21][1] = "80"
+  actionTable[71][23][0] = "R"
+  actionTable[71][23][1] = "80"
+  actionTable[71][1][0] = "R"
+  actionTable[71][1][1] = "80"
+  actionTable[71][39][0] = "R"
+  actionTable[71][39][1] = "80"
+  actionTable[71][9][0] = "R"
+  actionTable[71][9][1] = "80"
+  actionTable[71][11][0] = "R"
+  actionTable[71][11][1] = "80"
+  actionTable[71][10][0] = "R"
+  actionTable[71][10][1] = "80"
+  actionTable[71][6][0] = "R"
+  actionTable[71][6][1] = "80"
+  
+  actionTable[72][13][0] = "R"
+  actionTable[72][13][1] = "81"
+  actionTable[72][2][0] = "R"
+  actionTable[72][2][1] = "81"
+  actionTable[72][4][0] = "R"
+  actionTable[72][4][1] = "81"
+  actionTable[72][41][0] = "R"
+  actionTable[72][41][1] = "81"
+  actionTable[72][40][0] = "R"
+  actionTable[72][40][1] = "81"
+  actionTable[72][25][0] = "R"
+  actionTable[72][25][1] = "81"
+  actionTable[72][24][0] = "R"
+  actionTable[72][24][1] = "81"
+  actionTable[72][20][0] = "R"
+  actionTable[72][20][1] = "81"
+  actionTable[72][22][0] = "R"
+  actionTable[72][22][1] = "81"
+  actionTable[72][21][0] = "R"
+  actionTable[72][21][1] = "81"
+  actionTable[72][23][0] = "R"
+  actionTable[72][23][1] = "81"
+  actionTable[72][1][0] = "R"
+  actionTable[72][1][1] = "81"
+  actionTable[72][39][0] = "R"
+  actionTable[72][39][1] = "81"
+  actionTable[72][9][0] = "R"
+  actionTable[72][9][1] = "81"
+  actionTable[72][11][0] = "R"
+  actionTable[72][11][1] = "81"
+  actionTable[72][10][0] = "R"
+  actionTable[72][10][1] = "81"
+  actionTable[72][6][0] = "R"
+  actionTable[72][6][1] = "81"
 
-  actionTable[135][64][0] = "D"
-  actionTable[135][64][1] = "77"
+  actionTable[73][13][0] = "R"
+  actionTable[73][13][1] = "82"
+  actionTable[73][2][0] = "R"
+  actionTable[73][2][1] = "82"
+  actionTable[73][4][0] = "R"
+  actionTable[73][4][1] = "82"
+  actionTable[73][41][0] = "R"
+  actionTable[73][41][1] = "82"
+  actionTable[73][40][0] = "R"
+  actionTable[73][40][1] = "82"
+  actionTable[73][25][0] = "R"
+  actionTable[73][25][1] = "82"
+  actionTable[73][24][0] = "R"
+  actionTable[73][24][1] = "82"
+  actionTable[73][20][0] = "R"
+  actionTable[73][20][1] = "82"
+  actionTable[73][22][0] = "R"
+  actionTable[73][22][1] = "82"
+  actionTable[73][21][0] = "R"
+  actionTable[73][21][1] = "82"
+  actionTable[73][23][0] = "R"
+  actionTable[73][23][1] = "82"  
+  actionTable[73][1][0] = "R"
+  actionTable[73][1][1] = "82"
+  actionTable[73][39][0] = "R"
+  actionTable[73][39][1] = "82"
+  actionTable[73][21][0] = "R"
+  actionTable[73][21][1] = "82"
+  actionTable[73][9][0] = "R"
+  actionTable[73][9][1] = "82"
+  actionTable[73][11][0] = "R"
+  actionTable[73][11][1] = "82"
+  actionTable[73][10][0] = "R"
+  actionTable[73][10][1] = "82"
+  actionTable[73][6][0] = "R"
+  actionTable[73][6][1] = "82"
 
-  actionTable[135][66][0] = "D"
-  actionTable[135][66][1] = "78"
+  actionTable[74][13][0] = "R"
+  actionTable[74][13][1] = "83"
+  actionTable[74][2][0] = "R"
+  actionTable[74][2][1] = "83"
+  actionTable[74][4][0] = "R"
+  actionTable[74][4][1] = "83"
+  actionTable[74][41][0] = "R"
+  actionTable[74][41][1] = "83"
+  actionTable[74][40][0] = "R"
+  actionTable[74][40][1] = "83"
+  actionTable[74][25][0] = "R"
+  actionTable[74][25][1] = "83"
+  actionTable[74][24][0] = "R"
+  actionTable[74][24][1] = "83"
+  actionTable[74][20][0] = "R"
+  actionTable[74][20][1] = "83"
+  actionTable[74][22][0] = "R"
+  actionTable[74][22][1] = "83"
+  actionTable[74][21][0] = "R"
+  actionTable[74][21][1] = "83"
+  actionTable[74][23][0] = "R"
+  actionTable[74][23][1] = "83"
+  actionTable[74][1][0] = "R"
+  actionTable[74][1][1] = "83"
+  actionTable[74][39][0] = "R"
+  actionTable[74][39][1] = "83"
+  actionTable[74][9][0] = "R"
+  actionTable[74][9][1] = "83"
+  actionTable[74][11][0] = "R"
+  actionTable[74][11][1] = "83"
+  actionTable[74][10][0] = "R"
+  actionTable[74][10][1] = "83"
+  actionTable[74][6][0] = "R"
+  actionTable[74][6][1] = "83"
 
-  actionTable[135][63][0] = "D"
-  actionTable[135][63][1] = "79"
+  actionTable[75][13][0] = "D"
+  actionTable[75][13][1] = "103"
 
-  actionTable[136][69][0] = "D"
-  actionTable[136][69][1] = "28"
+  actionTable[76][4][0] = "D"
+  actionTable[76][4][1] = "104"
 
-  actionTable[137][4][0] = "D"
-  actionTable[137][4][1] = "139"
+  actionTable[77][2][0] = "D"
+  actionTable[77][2][1] = "106"
+  actionTable[77][4][0] = "R"
+  actionTable[77][4][1] = "35"
+  actionTable[77][6][0] = "R"
+  actionTable[77][6][1] = "35"
 
-  actionTable[138][13][0] = "D"
-  actionTable[138][13][1] = "48"
+  actionTable[78][13][0] = "R"
+  actionTable[78][13][1] = "28"
+  actionTable[78][67][0] = "R"
+  actionTable[78][67][1] = "28"
+  actionTable[78][8][0] = "R"
+  actionTable[78][8][1] = "28"
+  actionTable[78][49][0] = "R"
+  actionTable[78][49][1] = "28"
+  actionTable[78][50][0] = "R"
+  actionTable[78][50][1] = "28"
+  actionTable[78][51][0] = "R"
+  actionTable[78][51][1] = "28"
+  actionTable[78][54][0] = "R"
+  actionTable[78][54][1] = "28"
+  actionTable[78][38][0] = "R"
+  actionTable[78][38][1] = "28"
+  actionTable[78][57][0] = "R"
+  actionTable[78][57][1] = "28"
 
-  actionTable[138][67][0] = "D"
-  actionTable[138][67][1] = "40"
+  actionTable[79][13][0] = "R"
+  actionTable[79][13][1] = "29"
+  actionTable[79][67][0] = "R"
+  actionTable[79][67][1] = "29"
+  actionTable[79][8][0] = "R"
+  actionTable[79][8][1] = "29"
+  actionTable[79][49][0] = "R"
+  actionTable[79][49][1] = "29"
+  actionTable[79][50][0] = "R"
+  actionTable[79][50][1] = "29"
+  actionTable[79][51][0] = "R"
+  actionTable[79][51][1] = "29"
+  actionTable[79][54][0] = "R"
+  actionTable[79][54][1] = "29"
+  actionTable[79][38][0] = "R"
+  actionTable[79][38][1] = "29"
+  actionTable[79][57][0] = "R"
+  actionTable[79][57][1] = "29"
 
-  actionTable[138][8][0] = "D"
-  actionTable[138][8][1] = "140"
+  actionTable[80][4][0] = "D"
+  actionTable[80][4][1] = "107"
 
-  actionTable[138][49][0] = "D"
-  actionTable[138][49][1] = "41"
+  actionTable[81][13][0] = "D"
+  actionTable[81][13][1] = "43"
+  actionTable[81][67][0] = "D"
+  actionTable[81][67][1] = "35"
+  actionTable[81][8][0] = "D"
+  actionTable[81][8][1] = "108"
+  actionTable[81][49][0] = "D"
+  actionTable[81][49][1] = "36"
+  actionTable[81][49][0] = "D"
+  actionTable[81][49][1] = "36"
+  actionTable[81][50][0] = "D"
+  actionTable[81][50][1] = "37"
+  actionTable[81][51][0] = "D"
+  actionTable[81][51][1] = "39"
+  actionTable[81][54][0] = "D"
+  actionTable[81][54][1] = "40"
+  actionTable[81][38][0] = "D"
+  actionTable[81][38][1] = "41"
+  actionTable[81][57][0] = "D"
+  actionTable[81][57][1] = "42"
 
-  actionTable[138][50][0] = "D"
-  actionTable[138][50][1] = "42"
+  actionTable[82][13][0] = "R"
+  actionTable[82][13][1] = "43"
+  actionTable[82][67][0] = "R"
+  actionTable[82][67][1] = "43"
+  actionTable[82][8][0] = "R"
+  actionTable[82][8][1] = "43"
+  actionTable[82][49][0] = "R"
+  actionTable[82][49][1] = "43"
+  actionTable[82][50][0] = "R"
+  actionTable[82][50][1] = "43"
+  actionTable[82][51][0] = "R"
+  actionTable[82][51][1] = "43"
+  actionTable[82][54][0] = "R"
+  actionTable[82][54][1] = "43"
+  actionTable[82][38][0] = "R"
+  actionTable[82][38][1] = "43"
+  actionTable[82][57][0] = "R"
+  actionTable[82][57][1] = "43"
 
-  actionTable[138][51][0] = "D"
-  actionTable[138][51][1] = "44"
+  actionTable[83][67][0] = "D"
+  actionTable[83][67][1] = "65"
+  actionTable[83][3][0] = "D"
+  actionTable[83][3][1] = "69"
+  actionTable[83][1][0] = "D"
+  actionTable[83][1][1] = "62"
+  actionTable[83][39][0] = "D"
+  actionTable[83][39][1] = "63"
+  actionTable[83][61][0] = "D"
+  actionTable[83][61][1] = "64"
+  actionTable[83][5][0] = "D"
+  actionTable[83][5][1] = "70"
+  actionTable[83][65][0] = "D"
+  actionTable[83][65][1] = "71"
+  actionTable[83][64][0] = "D"
+  actionTable[83][64][1] = "72"
+  actionTable[83][66][0] = "D"
+  actionTable[83][66][1] = "73"
+  actionTable[83][63][0] = "D"
+  actionTable[83][63][1] = "74"
 
-  actionTable[138][54][0] = "D"
-  actionTable[138][54][1] = "45"
+  actionTable[84][67][0] = "D"
+  actionTable[84][67][1] = "65"
+  actionTable[84][3][0] = "D"
+  actionTable[84][3][1] = "69"
+  actionTable[84][1][0] = "D"
+  actionTable[84][1][1] = "62"
+  actionTable[84][39][0] = "D"
+  actionTable[84][39][1] = "63"
+  actionTable[84][61][0] = "D"
+  actionTable[84][61][1] = "64"
+  actionTable[84][5][0] = "D"
+  actionTable[84][5][1] = "70"
+  actionTable[84][65][0] = "D"
+  actionTable[84][65][1] = "71"
+  actionTable[84][64][0] = "D"
+  actionTable[84][64][1] = "72"
+  actionTable[84][66][0] = "D"
+  actionTable[84][66][1] = "73"
+  actionTable[84][63][0] = "D"
+  actionTable[84][63][1] = "74"
+  
+  actionTable[85][67][0] = "D"
+  actionTable[85][67][1] = "65"
+  actionTable[85][3][0] = "D"
+  actionTable[85][3][1] = "69"
+  actionTable[85][1][0] = "D"
+  actionTable[85][1][1] = "62"
+  actionTable[85][39][0] = "D"
+  actionTable[85][39][1] = "63"
+  actionTable[85][61][0] = "D"
+  actionTable[85][61][1] = "64"
+  actionTable[85][5][0] = "D"
+  actionTable[85][5][1] = "70"
+  actionTable[85][65][0] = "D"
+  actionTable[85][65][1] = "71"
+  actionTable[85][64][0] = "D"
+  actionTable[85][64][1] = "72"
+  actionTable[85][66][0] = "D"
+  actionTable[85][66][1] = "73"
+  actionTable[85][63][0] = "D"
+  actionTable[85][63][1] = "74"
 
-  actionTable[138][38][0] = "D"
-  actionTable[138][38][1] = "46"
+  actionTable[86][67][0] = "R"
+  actionTable[86][67][1] = "52"
+  actionTable[86][3][0] = "R"
+  actionTable[86][3][1] = "52"
+  actionTable[86][1][0] = "R"
+  actionTable[86][1][1] = "52"
+  actionTable[86][39][0] = "R"
+  actionTable[86][39][1] = "52"
+  actionTable[86][61][0] = "R"
+  actionTable[86][61][1] = "52"
+  actionTable[86][5][0] = "R"
+  actionTable[86][5][1] = "52"
+  actionTable[86][65][0] = "R"
+  actionTable[86][65][1] = "52"
+  actionTable[86][64][0] = "R"
+  actionTable[86][64][1] = "52"
+  actionTable[86][66][0] = "R"
+  actionTable[86][66][1] = "52"
+  actionTable[86][63][0] = "R"
+  actionTable[86][63][1] = "52"
 
-  actionTable[138][57][0] = "D"
-  actionTable[138][57][1] = "47"
+  actionTable[87][67][0] = "R"
+  actionTable[87][67][1] = "53"
+  actionTable[87][3][0] = "R"
+  actionTable[87][3][1] = "53"
+  actionTable[87][1][0] = "R"
+  actionTable[87][1][1] = "53"
+  actionTable[87][39][0] = "R"
+  actionTable[87][39][1] = "53"
+  actionTable[87][61][0] = "R"
+  actionTable[87][61][1] = "53"
+  actionTable[87][5][0] = "R"
+  actionTable[87][5][1] = "53"
+  actionTable[87][65][0] = "R"
+  actionTable[87][65][1] = "53"
+  actionTable[87][64][0] = "R"
+  actionTable[87][64][1] = "53"
+  actionTable[87][66][0] = "R"
+  actionTable[87][66][1] = "53"
+  actionTable[87][63][0] = "R"
+  actionTable[87][63][1] = "53"
 
-  actionTable[139][7][0] = "D"
-  actionTable[139][7][1] = "141"
+  actionTable[88][67][0] = "D"
+  actionTable[88][67][1] = "65"
+  actionTable[88][3][0] = "D"
+  actionTable[88][3][1] = "69"
+  actionTable[88][1][0] = "D"
+  actionTable[88][1][1] = "62"
+  actionTable[88][39][0] = "D"
+  actionTable[88][39][1] = "63"
+  actionTable[88][61][0] = "D"
+  actionTable[88][61][1] = "64"
+  actionTable[88][5][0] = "D"
+  actionTable[88][5][1] = "70"
+  actionTable[88][65][0] = "D"
+  actionTable[88][65][1] = "71"
+  actionTable[88][64][0] = "D"
+  actionTable[88][64][1] = "72"
+  actionTable[88][66][0] = "D"
+  actionTable[88][66][1] = "73"
+  actionTable[88][63][0] = "D"
+  actionTable[88][63][1] = "74"
+  
+  actionTable[89][67][0] = "R"
+  actionTable[89][67][1] = "56"
+  actionTable[89][3][0] = "R"
+  actionTable[89][3][1] = "56"
+  actionTable[89][1][0] = "R"
+  actionTable[89][1][1] = "56"
+  actionTable[89][39][0] = "R"
+  actionTable[89][39][1] = "56"
+  actionTable[89][61][0] = "R"
+  actionTable[89][61][1] = "56"
+  actionTable[89][5][0] = "R"
+  actionTable[89][5][1] = "56"
+  actionTable[89][65][0] = "R"
+  actionTable[89][65][1] = "56"
+  actionTable[89][64][0] = "R"
+  actionTable[89][64][1] = "56"
+  actionTable[89][66][0] = "R"
+  actionTable[89][66][1] = "56"
+  actionTable[89][63][0] = "R"
+  actionTable[89][63][1] = "56"
 
-  actionTable[140][13][0] = "R"
-  actionTable[140][13][1] = "39"
+  actionTable[90][67][0] = "R"
+  actionTable[90][67][1] = "57"
+  actionTable[90][3][0] = "R"
+  actionTable[90][3][1] = "57"
+  actionTable[90][1][0] = "R"
+  actionTable[90][1][1] = "57"
+  actionTable[90][39][0] = "R"
+  actionTable[90][39][1] = "57"
+  actionTable[90][61][0] = "R"
+  actionTable[90][61][1] = "57"
+  actionTable[90][5][0] = "R"
+  actionTable[90][5][1] = "57"
+  actionTable[90][65][0] = "R"
+  actionTable[90][65][1] = "57"
+  actionTable[90][64][0] = "R"
+  actionTable[90][64][1] = "57"
+  actionTable[90][66][0] = "R"
+  actionTable[90][66][1] = "57"
+  actionTable[90][63][0] = "R"
+  actionTable[90][63][1] = "57"
 
-  actionTable[140][67][0] = "R"
-  actionTable[140][67][1] = "39"
+  actionTable[91][67][0] = "R"
+  actionTable[91][67][1] = "58"
+  actionTable[91][3][0] = "R"
+  actionTable[91][3][1] = "58"
+  actionTable[91][1][0] = "R"
+  actionTable[91][1][1] = "58"
+  actionTable[91][39][0] = "R"
+  actionTable[91][39][1] = "58"
+  actionTable[91][61][0] = "R"
+  actionTable[91][61][1] = "58"
+  actionTable[91][5][0] = "R"
+  actionTable[91][5][1] = "58"
+  actionTable[91][65][0] = "R"
+  actionTable[91][65][1] = "58"
+  actionTable[91][64][0] = "R"
+  actionTable[91][64][1] = "58"
+  actionTable[91][66][0] = "R"
+  actionTable[91][66][1] = "58"
+  actionTable[91][63][0] = "R"
+  actionTable[91][63][1] = "58"
 
-  actionTable[140][8][0] = "R"
-  actionTable[140][8][1] = "39"
+  actionTable[92][67][0] = "R"
+  actionTable[92][67][1] = "59"
+  actionTable[92][3][0] = "R"
+  actionTable[92][3][1] = "59"
+  actionTable[92][1][0] = "R"
+  actionTable[92][1][1] = "59"
+  actionTable[92][39][0] = "R"
+  actionTable[92][39][1] = "59"
+  actionTable[92][61][0] = "R"
+  actionTable[92][61][1] = "59"
+  actionTable[92][5][0] = "R"
+  actionTable[92][5][1] = "59"
+  actionTable[92][65][0] = "R"
+  actionTable[92][65][1] = "59"
+  actionTable[92][64][0] = "R"
+  actionTable[92][64][1] = "59"
+  actionTable[92][66][0] = "R"
+  actionTable[92][66][1] = "59"
+  actionTable[92][63][0] = "R"
+  actionTable[92][63][1] = "59"
 
-  actionTable[140][49][0] = "R"
-  actionTable[140][49][1] = "39"
-
-  actionTable[140][50][0] = "R"
-  actionTable[140][50][1] = "39"
-
-  actionTable[140][51][0] = "R"
-  actionTable[140][51][1] = "39"
-
-  actionTable[140][54][0] = "R"
-  actionTable[140][54][1] = "39"
-
-  actionTable[140][38][0] = "R"
-  actionTable[140][38][1] = "39"
-
-  actionTable[140][57][0] = "R"
-  actionTable[140][57][1] = "39"
-
-  actionTable[141][69][0] = "D"
-  actionTable[141][69][1] = "28"
-
-  actionTable[142][13][0] = "D"
-  actionTable[142][13][1] = "48"
-
-  actionTable[142][67][0] = "D"
-  actionTable[142][67][1] = "40"
-
-  actionTable[142][8][0] = "D"
-  actionTable[142][8][1] = "143"
-
-  actionTable[142][49][0] = "D"
-  actionTable[142][49][1] = "41"
-
-  actionTable[142][50][0] = "D"
-  actionTable[142][50][1] = "42"
-
-  actionTable[142][51][0] = "D"
-  actionTable[142][51][1] = "44"
-
-  actionTable[142][54][0] = "D"
-  actionTable[142][54][1] = "45"
-
-  actionTable[142][38][0] = "D"
-  actionTable[142][38][1] = "46"
-
-  actionTable[142][57][0] = "D"
-  actionTable[142][57][1] = "47"
-
-  actionTable[143][69][0] = "R"
-  actionTable[143][69][1] = "37"
-
-  actionTable[143][53][0] = "R"
-  actionTable[143][53][1] = "37"
-
-  actionTable[142][52][0] = "R"
-  actionTable[143][52][1] = "37"
-
-  # -------------------- Go to table ----------------------------
+  actionTable[93][67][0] = "D"
+  actionTable[93][67][1] = "65"
+  actionTable[93][3][0] = "D"
+  actionTable[93][3][1] = "69"
+  actionTable[93][1][0] = "D"
+  actionTable[93][1][1] = "62"
+  actionTable[93][39][0] = "D"
+  actionTable[93][39][1] = "63"
+  actionTable[93][61][0] = "D"
+  actionTable[93][61][1] = "64"
+  actionTable[93][5][0] = "D"
+  actionTable[93][5][1] = "70"
+  actionTable[93][65][0] = "D"
+  actionTable[93][65][1] = "71"
+  actionTable[93][64][0] = "D"
+  actionTable[93][64][1] = "72"
+  actionTable[93][66][0] = "D"
+  actionTable[93][66][1] = "73"
+  actionTable[93][63][0] = "D"
+  actionTable[93][63][1] = "74"
+  
+  # ----------- Go to Table ------------------
+  
   gotoTable[0][1] = 1
   gotoTable[0][2] = 2
 
-  gotoTable[2][3] = 4
-  gotoTable[2][4] = 5
-  gotoTable[2][8] = 6
+  gotoTable[2][3] = 3
+  gotoTable[2][4] = 4
+  gotoTable[2][8] = 5
 
-  gotoTable[7][5] = 9
-  gotoTable[7][6] = 10
+  gotoTable[6][5] = 8
+  gotoTable[6][6] = 9
 
-  gotoTable[11][7] = 14
-
-  gotoTable[12][6] = 18
-  gotoTable[12][9] = 17
-
-  gotoTable[20][7]=22
-
-  gotoTable[23][10]=24
-
-  gotoTable[24][4]=27
-  gotoTable[24][11]=26
-
-  gotoTable[26][12]=30
-  gotoTable[26][13]=31
-  gotoTable[26][14]=32
-  gotoTable[26][15]=33
-  gotoTable[26][16]=34
-  gotoTable[26][17]=43
-  gotoTable[26][20]=35
-  gotoTable[26][23]=36
-  gotoTable[26][24]=37
-  gotoTable[26][25]=38
-  gotoTable[26][26]=39
-
-  gotoTable[47][17]=71
-  gotoTable[47][27]=57
-  gotoTable[47][28]=58
-  gotoTable[47][29]=59
-  gotoTable[47][30]=60
-  gotoTable[47][32]=61
-  gotoTable[47][34]=62
-  gotoTable[47][36]=63
-  gotoTable[47][38]=64
-  gotoTable[47][39]=65
-  gotoTable[47][40]=66
-  gotoTable[47][41]=72
-  gotoTable[47][42]=73
-
-  gotoTable[49][17]=71
-  gotoTable[49][27]=80
-  gotoTable[49][28]=58
-  gotoTable[49][29]=59
-  gotoTable[49][30]=60
-  gotoTable[49][32]=61
-  gotoTable[49][34]=62
-  gotoTable[49][36]=63
-  gotoTable[49][38]=64
-  gotoTable[49][39]=65
-  gotoTable[49][40]=66
-  gotoTable[49][41]=72
-  gotoTable[49][42]=73
-
-  gotoTable[50][17]=71
-  gotoTable[50][18]=81
-  gotoTable[50][27]=82
-  gotoTable[50][28]=58
-  gotoTable[50][29]=59
-  gotoTable[50][30]=60
-  gotoTable[50][32]=61
-  gotoTable[50][34]=62
-  gotoTable[50][36]=63
-  gotoTable[50][38]=64
-  gotoTable[50][39]=65
-  gotoTable[50][40]=66
-  gotoTable[50][41]=72
-  gotoTable[50][42]=73
-
-  gotoTable[54][17]=71
-  gotoTable[54][27]=86
-  gotoTable[54][28]=58
-  gotoTable[54][29]=59
-  gotoTable[54][30]=60
-  gotoTable[54][32]=61
-  gotoTable[54][34]=62
-  gotoTable[54][36]=63
-  gotoTable[54][38]=64
-  gotoTable[54][39]=65
-  gotoTable[54][40]=66
-  gotoTable[54][41]=72
-  gotoTable[54][42]=73
-
-  gotoTable[55][11]=87
-
-  gotoTable[60][31]=91
-
-  gotoTable[61][33]=94
-
-  gotoTable[62][35]=99
-
-  gotoTable[63][37]=102
-
-  gotoTable[65][17]=71
-  gotoTable[65][38]=106
-  gotoTable[65][39]=65
-  gotoTable[65][40]=66
-  gotoTable[65][41]=72
-  gotoTable[65][42]=73
-
-  gotoTable[74][17]=71
-  gotoTable[74][27]=107
-  gotoTable[74][28]=58
-  gotoTable[74][29]=59
-  gotoTable[74][30]=60
-  gotoTable[74][32]=61
-  gotoTable[74][34]=62
-  gotoTable[74][36]=63
-  gotoTable[74][38]=64
-  gotoTable[74][39]=65
-  gotoTable[74][40]=66
-  gotoTable[74][41]=72
-  gotoTable[74][42]=73
-
-  gotoTable[75][17]=71
-  gotoTable[75][18]=108
-  gotoTable[75][27]=82
-  gotoTable[75][28]=58
-  gotoTable[75][29]=59
-  gotoTable[75][30]=60
-  gotoTable[75][32]=61
-  gotoTable[75][34]=62
-  gotoTable[75][36]=63
-  gotoTable[75][38]=64
-  gotoTable[75][39]=65
-  gotoTable[75][40]=66
-  gotoTable[75][41]=72
-  gotoTable[75][42]=73
-
-  gotoTable[82][19]=111
-
-  gotoTable[87][12]=30
-  gotoTable[87][13]=31
-  gotoTable[87][14]=32
-  gotoTable[87][15]=33
-  gotoTable[87][16]=34
-  gotoTable[87][17]=43
-  gotoTable[87][20]=35
-  gotoTable[87][23]=36
-  gotoTable[87][24]=37
-  gotoTable[87][25]=38
-  gotoTable[87][26]=39
- 
-  gotoTable[89][17] = 71
-  gotoTable[89][29] = 116
-  gotoTable[89][30] = 60
-  gotoTable[89][32] = 61
-  gotoTable[89][34] = 62
-  gotoTable[89][36] = 63
-  gotoTable[89][38] = 64
-  gotoTable[89][39] = 65
-  gotoTable[89][40] = 66
-  gotoTable[89][41] = 72
-  gotoTable[89][42] = 73
-
-  gotoTable[90][17] = 71
-  gotoTable[90][30] = 117
-  gotoTable[90][32] = 61
-  gotoTable[90][34] = 62
-  gotoTable[90][36] = 63
-  gotoTable[90][38] = 64
-  gotoTable[90][39] = 65
-  gotoTable[90][40] = 66
-  gotoTable[90][41] = 72
-  gotoTable[90][42] = 73
-
-  gotoTable[91][17] = 71
-  gotoTable[91][32] = 118
-  gotoTable[91][34] = 62
-  gotoTable[91][36] = 63
-  gotoTable[91][38] = 64
-  gotoTable[91][39] = 65
-  gotoTable[91][40] = 66
-  gotoTable[91][41] = 72
-  gotoTable[91][42] = 73
-
-  gotoTable[94][17] = 71
-  gotoTable[94][34] = 119
-  gotoTable[94][36] = 63
-  gotoTable[94][38] = 64
-  gotoTable[94][39] = 65
-  gotoTable[94][40] = 66
-  gotoTable[94][41] = 72
-  gotoTable[94][42] = 73
-
-  gotoTable[99][17] = 71
-  gotoTable[99][36] = 120
-  gotoTable[99][38] = 64
-  gotoTable[99][39] = 65
-  gotoTable[99][40] = 66
-  gotoTable[99][41] = 72
-  gotoTable[99][42] = 73
-
-  gotoTable[102][17] = 71
-  gotoTable[102][38] = 121
-  gotoTable[102][39] = 65
-  gotoTable[102][40] = 66
-  gotoTable[102][41] = 72
-  gotoTable[102][42] = 73
-
-  gotoTable[112][17] = 73
-  gotoTable[112][27] = 124
-  gotoTable[112][28] = 58
-  gotoTable[112][29] = 59
-  gotoTable[112][30] = 60
-  gotoTable[112][32] = 61
-  gotoTable[112][34] = 62
-  gotoTable[112][36] = 63
-  gotoTable[112][38] = 64
-  gotoTable[112][39] = 65
-  gotoTable[112][40] = 66
-  gotoTable[112][41] = 72
-  gotoTable[112][42] = 73
-
-  gotoTable[117][31] = 91
+  gotoTable[10][7] = 13
   
-  gotoTable[118][33] = 94
+  gotoTable[11][6] = 16
+  gotoTable[11][9] = 15
 
-  gotoTable[119][35] = 99
+  gotoTable[17][7] = 19
 
-  gotoTable[120][37] = 102
+  gotoTable[20][10] = 21
+  
+  gotoTable[21][4] = 23
+  gotoTable[21][11] = 22
 
-  gotoTable[124][19] = 126
+  gotoTable[22][12] = 25
+  gotoTable[22][13] = 26
+  gotoTable[22][14] = 27
+  gotoTable[22][15] = 28
+  gotoTable[22][16] = 29
+  gotoTable[22][17] = 38
+  gotoTable[22][20] = 30
+  gotoTable[22][23] = 31
+  gotoTable[22][24] = 32
+  gotoTable[22][25] = 33
+  gotoTable[22][26] = 34
 
-  gotoTable[125][11] = 127
+  gotoTable[42][17] = 66
+  gotoTable[42][27] = 52
+  gotoTable[42][28] = 53
+  gotoTable[42][29] = 54
+  gotoTable[42][30] = 55
+  gotoTable[42][32] = 56
+  gotoTable[42][34] = 57
+  gotoTable[42][36] = 58
+  gotoTable[42][38] = 59
+  gotoTable[42][39] = 60
+  gotoTable[42][40] = 61
+  gotoTable[42][41] = 67
+  gotoTable[42][42] = 68
+  
+  gotoTable[44][17] = 66
+  gotoTable[44][27] = 75
+  gotoTable[44][28] = 53
+  gotoTable[44][29] = 54
+  gotoTable[44][30] = 55
+  gotoTable[44][32] = 56
+  gotoTable[44][34] = 57
+  gotoTable[44][36] = 58
+  gotoTable[44][38] = 59
+  gotoTable[44][39] = 60
+  gotoTable[44][40] = 61
+  gotoTable[44][41] = 67
+  gotoTable[44][42] = 68
 
-  gotoTable[127][12] = 30
-  gotoTable[127][13] = 31
-  gotoTable[127][14] = 32
-  gotoTable[127][15] = 33
-  gotoTable[127][16] = 34
-  gotoTable[127][17] = 43
-  gotoTable[127][20] = 35
-  gotoTable[127][23] = 36
-  gotoTable[127][24] = 37
-  gotoTable[127][25] = 38
-  gotoTable[127][26] = 39
+  gotoTable[45][17] = 66
+  gotoTable[45][18] = 76
+  gotoTable[45][27] = 77
+  gotoTable[45][28] = 53
+  gotoTable[45][29] = 54
+  gotoTable[45][30] = 55
+  gotoTable[45][32] = 56
+  gotoTable[45][34] = 57
+  gotoTable[45][36] = 58
+  gotoTable[45][38] = 59
+  gotoTable[45][39] = 60
+  gotoTable[45][40] = 61
+  gotoTable[45][41] = 67
+  gotoTable[45][42] = 68
 
-  gotoTable[128][21] = 129
+  gotoTable[49][17] = 66
+  gotoTable[49][27] = 80
+  gotoTable[49][28] = 53
+  gotoTable[49][29] = 54
+  gotoTable[49][30] = 55
+  gotoTable[49][32] = 56
+  gotoTable[49][34] = 57
+  gotoTable[49][36] = 58
+  gotoTable[49][38] = 59
+  gotoTable[49][39] = 60
+  gotoTable[49][40] = 61
+  gotoTable[49][41] = 67
+  gotoTable[49][42] = 68
 
-  gotoTable[129][22] = 131
+  gotoTable[50][11] = 81
 
-  gotoTable[135][17] = 71
-  gotoTable[135][27] = 137
-  gotoTable[135][28] = 58
-  gotoTable[135][29] = 59
-  gotoTable[135][30] = 60
-  gotoTable[135][32] = 61
-  gotoTable[135][34] = 62
-  gotoTable[135][36] = 63
-  gotoTable[135][38] = 64
-  gotoTable[135][39] = 65
-  gotoTable[135][40] = 66
-  gotoTable[135][41] = 72
-  gotoTable[135][42] = 73
+  gotoTable[55][31] = 85
 
-  gotoTable[136][11] = 138
+  gotoTable[56][33] = 88
 
-  gotoTable[138][12] = 30
-  gotoTable[138][13] = 31
-  gotoTable[138][14] = 32
-  gotoTable[138][15] = 33
-  gotoTable[138][16] = 34
-  gotoTable[138][17] = 43
-  gotoTable[138][20] = 35
-  gotoTable[138][23] = 36
-  gotoTable[138][24] = 37
-  gotoTable[138][25] = 38
-  gotoTable[138][26] = 39
+  gotoTable[57][35] = 93
 
-  gotoTable[141][11] = 142
+  gotoTable[58][37] = 96
 
-  gotoTable[142][12] = 30
-  gotoTable[142][13] = 31
-  gotoTable[142][14] = 32
-  gotoTable[142][15] = 33
-  gotoTable[142][16] = 34
-  gotoTable[142][17] = 43
-  gotoTable[142][20] = 35
-  gotoTable[142][23] = 36
-  gotoTable[142][24] = 37
-  gotoTable[142][25] = 38
-  gotoTable[142][26] = 39
+  gotoTable[60][17] = 66
+  gotoTable[60][38] = 100
+  gotoTable[60][39] = 60
+  gotoTable[60][40] = 61
+  gotoTable[60][41] = 67
+  gotoTable[60][42] = 68
 
+  gotoTable[69][17] = 66
+  gotoTable[69][27] = 101
+  gotoTable[69][28] = 53
+  gotoTable[69][29] = 54
+  gotoTable[69][30] = 55
+  gotoTable[69][32] = 56
+  gotoTable[69][34] = 57
+  gotoTable[69][36] = 58
+  gotoTable[69][38] = 59
+  gotoTable[69][39] = 60
+  gotoTable[69][40] = 61
+  gotoTable[69][41] = 67
+  gotoTable[69][42] = 68
+
+  gotoTable[70][17] = 66
+  gotoTable[70][18] = 102
+  gotoTable[70][27] = 77
+  gotoTable[70][28] = 53
+  gotoTable[70][29] = 54
+  gotoTable[70][30] = 55
+  gotoTable[70][32] = 56
+  gotoTable[70][34] = 57
+  gotoTable[70][36] = 58
+  gotoTable[70][38] = 59
+  gotoTable[70][39] = 60
+  gotoTable[70][40] = 61
+  gotoTable[70][41] = 67
+  gotoTable[70][42] = 68
+
+  gotoTable[77][19] = 105
+  
+  gotoTable[81][12] = 25
+  gotoTable[81][13] = 26
+  gotoTable[81][14] = 27
+  gotoTable[81][15] = 28
+  gotoTable[81][16] = 29
+  gotoTable[81][17] = 38
+  gotoTable[81][20] = 30
+  gotoTable[81][23] = 31
+  gotoTable[81][24] = 32
+  gotoTable[81][25] = 33
+  gotoTable[81][26] = 34
+
+  #---------------------------------------Juanpa---------------------------------------
+  gotoTable[83][17] = 66
+  gotoTable[83][29] = 109
+  gotoTable[83][30] = 55
+  gotoTable[83][32] = 56
+  gotoTable[83][57] = 34
+  gotoTable[83][36] = 58
+  gotoTable[83][38] = 59
+  gotoTable[83][39] = 60
+  gotoTable[83][40] = 61
+  gotoTable[83][41] = 67
+  gotoTable[83][42] = 68
+
+  gotoTable[84][17] = 66
+  gotoTable[84][30] = 110
+  gotoTable[84][32] = 56
+  gotoTable[84][34] = 57
+  gotoTable[84][36] = 58
+  gotoTable[84][38] = 59
+  gotoTable[84][39] = 60
+  gotoTable[84][40] = 61
+  gotoTable[84][41] = 67
+  gotoTable[84][42] = 68
+  
+  gotoTable[85][17] = 66
+  gotoTable[85][32] = 111
+  gotoTable[85][34] = 57
+  gotoTable[85][36] = 58
+  gotoTable[85][38] = 59
+  gotoTable[85][39] = 60
+  gotoTable[85][40] = 61
+  gotoTable[85][41] = 67
+  gotoTable[85][42] = 68
+
+  gotoTable[88][17] = 66
+  gotoTable[88][34] = 112
+  gotoTable[88][36] = 58
+  gotoTable[88][38] = 58
+  gotoTable[88][39] = 60
+  gotoTable[88][40] = 61
+  gotoTable[88][41] = 67
+  gotoTable[88][42] = 68
+
+  gotoTable[93][17] = 66
+  gotoTable[93][36] = 113
+  gotoTable[93][38] = 59
+  gotoTable[93][39] = 60
+  gotoTable[93][40] = 61
+  gotoTable[93][41] = 67
+  gotoTable[93][42] = 68
+
+  gotoTable[96][17] = 66 
+  gotoTable[96][38] = 114
+  gotoTable[96][39] = 60
+  gotoTable[96][40] = 61
+  gotoTable[96][41] = 67
+  gotoTable[96][42] = 68
+
+  gotoTable[106][17] = 66
+  gotoTable[106][27] = 117
+  gotoTable[106][28] = 53
+  gotoTable[106][29] = 54
+  gotoTable[106][30] = 55
+  gotoTable[106][32] = 56
+  gotoTable[106][34] = 57
+  gotoTable[106][36] = 58
+  gotoTable[106][38] = 59
+  gotoTable[106][39] = 60
+  gotoTable[106][40] = 61
+  gotoTable[106][41] = 67
+  gotoTable[106][42] = 68
+
+  gotoTable[110][31] = 85 
+
+  gotoTable[111][33] = 88
+
+  gotoTable[112][35] = 93
+
+  gotoTable[113][37] = 96
+
+  gotoTable[117][19] = 119
+
+  gotoTable[118][11] = 120
+
+  gotoTable[120][12] = 25
+  gotoTable[120][13] = 26
+  gotoTable[120][14] = 27
+  gotoTable[120][15] = 28
+  gotoTable[120][16] = 29
+  gotoTable[120][17] = 38
+  gotoTable[120][20] = 30
+  gotoTable[120][23] = 31
+  gotoTable[120][24] = 32
+  gotoTable[120][25] = 33
+  gotoTable[120][26] = 34
+
+  gotoTable[121][21] = 122
+
+  gotoTable[122][22] = 123
+
+  gotoTable[126][17] = 66
+  gotoTable[126][27] = 128
+  gotoTable[126][28] = 53
+  gotoTable[126][29] = 54
+  gotoTable[126][30] = 55
+  gotoTable[126][32] = 56
+  gotoTable[126][34] = 57
+  gotoTable[126][36] = 58
+  gotoTable[126][38] = 59
+  gotoTable[126][39] = 60
+  gotoTable[126][40] = 61
+  gotoTable[126][41] = 67
+  gotoTable[126][42] = 68
+
+  gotoTable[127][11] = 129
+
+  gotoTable[129][12] = 25
+  gotoTable[129][13] = 26
+  gotoTable[129][14] = 27
+  gotoTable[129][15] = 28
+  gotoTable[129][16] = 29
+  gotoTable[129][17] = 38
+  gotoTable[129][20] = 30
+  gotoTable[129][23] = 31
+  gotoTable[129][24] = 32
+  gotoTable[129][25] = 33
+  gotoTable[129][26] = 34
+
+  gotoTable[132][11] = 133
+
+  gotoTable[133][12] = 25
+  gotoTable[133][13] = 26
+  gotoTable[133][14] = 27
+  gotoTable[133][15] = 28
+  gotoTable[133][16] = 29
+  gotoTable[133][17] = 38
+  gotoTable[133][20] = 30
+  gotoTable[133][23] = 31
+  gotoTable[133][24] = 32
+  gotoTable[133][25] = 33
+  gotoTable[133][26] = 34
+  
   # Grammar
-  SLRGrammar = []
 
   SLRGrammar.append(Grammar("S", "program"))
   SLRGrammar.append(Grammar("program", "def-list"))
@@ -3687,10 +3210,121 @@ def syntacticalInizialization():
   SLRGrammar.append(Grammar("lit","lit-char"))
   SLRGrammar.append(Grammar("lit","str"))
 
-# Driver code
-#readFile()
-#lexicalAnalize()
-#tokenList.append(68)  #Append end of string
-#print("Token list: ", tokenList)
-syntacticalInizialization()
-print(gotoList)
+def syntacticalAnalyze():
+  global column
+  stackTop = 0
+
+  global stack
+
+  global pos
+  global currToken
+  currToken = tokenList[pos]
+  nextToken = tokenList[pos]
+  #Iterative process
+  global asked
+  asked = False
+  global compiled
+  compiled = False
+  global exitCompiler
+  exitCompiler = False
+  global syntaxError
+  syntaxError = False
+
+  stackState = []
+
+  syntacticalInizialization()
+  
+  while(len(tokenList) >= 0 and compiled == False and exitCompiler == False and syntaxError == False):
+    # ---- Debugging purposes -------
+    currentStack = ""
+    for i in range(len(stack)):
+      currentStack += str(stack[i])
+    currentStack += '\n'
+    stackState.append(currentStack)
+    # -------------------------------
+    
+    stackTop = int(stack[len(stack)-1])
+    if(column == -1):
+      if(currToken != None):
+        column = getNextToken()
+      else:
+        column = 68
+
+    print("actionTable[stackTop][column][0]", stackTop, column, actionTable[stackTop][column][0])
+    if(actionTable[stackTop][column][0] == 0):
+      syntaxError = True
+      print("ERROR") 
+      #GestionarError(stackTop, colum)
+    else:
+      if(actionTable[stackTop][column][0] == 'D'):
+        print("Shifting")
+        shift(stackTop, column)
+      else:
+        if(actionTable[stackTop][column][0] == 'R'):
+          print("Reduction")
+          reduce(stackTop, column)
+        else:
+          if(actionTable[stackTop][column][0] == "acc"):
+            print("Accepted")
+            compiled = True
+    
+# ------------------- Driver code ------------------------------
+def getNextToken():
+  global pos
+
+  if(pos < len(tokenList)-1):
+    pos = pos + 1
+    return tokenList[pos]
+  else:
+    return 68
+
+def shift(f, c):
+  global asked
+  global currToken
+  global column
+  global stack
+  
+  num = int(actionTable[f][c][1])
+  stack.append(currToken)
+  stack.append(str(num))
+
+  if(asked == False):
+    currToken = tokenList[pos]
+  else:
+    currToken = nextToken
+    asked = False
+
+  column = -1
+  
+def reduce(f, c):
+  global prods
+  global stack
+  
+  nonTerminal = SLRGrammar[int(actionTable[f][c][1])].var
+  deletingNum = None
+
+  if(SLRGrammar[int(actionTable[f][c][1])].prod == '@'):
+    deletingNum = 0
+  else:
+    deletingNum = len(SLRGrammar[int(actionTable[f][c][1])].prod.split(' ')) * 2
+
+  for i in range(deletingNum):
+      stack.pop()
+
+  # -----------Debugging purposes only ------------
+  prod = ""
+  prod = prod + nonTerminal + "->"
+  if(SLRGrammar[int(actionTable[f][c][1])].prod == '@'):
+    prod = prod + "null\n"
+  else:
+    prod = prod + SLRGrammar[int(actionTable[f][c][1])].prod + "\n"
+  # -----------------------------------------------
+
+  x = int(stack[len(stack)-1])
+  stack.append(nonTerminal)
+  goNum = gotoTable[x][nonTerminals[nonTerminal]]
+  stack.append(goNum)
+  
+readFile()
+lexicalAnalize()
+syntacticalAnalyze()

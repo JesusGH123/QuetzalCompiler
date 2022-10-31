@@ -21,7 +21,7 @@ nonTerminals = SymbolTable.nonTerminals
 readedTokens = []  #For lexical analyzing
 
 currToken = None
-ROWS = 144; TERMINALS = 69; CONTENT = 2
+ROWS = 144; TERMINALS = 183; CONTENT = 2
 tokenList = []  #For syntactical analyzing
 actionTable = [[[0 for k in range(CONTENT)] for j in range(TERMINALS)] for i in range(ROWS)]
 gotoTable = [[-1 for j in range(TERMINALS)] for i in range(ROWS)]
@@ -59,25 +59,25 @@ def lexicalAnalize():
       elif (delimitedComment == True and line[i - 1] == '*'
             and line[i] == '/'):  #Ending of a multiline comment
         delimitedComment = False
-      elif (delimitedComment == True
-            ):  #Skip when analyzer is in multiline comment mode
+      elif (delimitedComment == True):  #Skip when analyzer is in multiline comment mode
         continue
       else:
-        if (line[i - 1] != '\\' and line[i] == '"' and stringMode == False):
+        if ((line[i - 1] != '\\' and line[i] == '"' and stringMode == False)
+            or (line[i] == "'" and stringMode == False)):
           if (currToken != ""):
             readedTokens.append(currToken)
             currToken = ""
           stringMode = True
           currToken = currToken + line[i]
-        elif (line[i - 1] != '\\' and line[i] == '"' and stringMode == True):
+        elif ((line[i - 1] != '\\' and line[i] == '"' and stringMode == True) 
+          or (i < len(line)+1 and line[i] == "'" and line[i + 1] != "'" and stringMode == True)):
           currToken = currToken + line[i]
           readedTokens.append(currToken)
           currToken = ""
           stringMode = False
         elif (stringMode == True):
           currToken = currToken + line[i]
-        elif (line[i] in skippedCharacters
-              ):  #If there is a skipping token check if currword has something
+        elif (line[i] in skippedCharacters):  #If there is a skipping token check if currword has something
           if (currToken != ""):
             readedTokens.append(currToken)
             currToken = ""
@@ -98,7 +98,6 @@ def lexicalAnalize():
             currToken = ""
           readedTokens.append(line[i] + line[i + 1])
           skipTokens = 1
-        #Check this condition
         elif (line[i] in separators):
           if (currToken != ""):
             readedTokens.append(currToken)
@@ -124,7 +123,7 @@ def literalValidaton(token, secondLap=False):
   if (token[0] == '"' and token[len(token) - 1] == '"'):  #String literal (63)
     tokenList.append(63)
     print(token, 63)
-  elif (re.match(r'(^-?[0-9]*$)', token)):  #Numeric literal (64)
+  elif (re.match(r'(^[\+|\-]?[0-9]*$)', token)):  #Numeric literal (64)
     tokenList.append(64)
     print(token, 64)
   elif(token == "false" or token == "true"):  #Boolean literal (65)
@@ -139,7 +138,7 @@ def literalValidaton(token, secondLap=False):
         tokenList.append(66)
         print(token, 66)
       else:
-        Error(token)
+        lexicalError(token)
     else:
       tokenList.append(66)
       print(token, 66)
@@ -165,22 +164,26 @@ def tokenValidation(token):
   for character in token:  #Validate each token
     if (character not in alphabet and character not in separators
         and character not in reservedWords):
-      Error(token)
+      lexicalError(token)
 
   #It is an ID
   tokenList.append(67)
   print(token, 67)
 
-
-def Error(token):
-  print(Fore.RED + "ERROR: Non recognized at line " + searchError(token) +
-        Fore.WHITE)
+def lexicalError(token):  
+  print(Fore.RED + "Error: Non recognized " + token + " at line " + searchError(token) + Fore.WHITE)
   exit(-1)
 
 def searchError(IncorrectToken):
   for line in range(len(file)):  #Search the error in the code
     if IncorrectToken in file[line]:
       return str(line + 1)
+
+def syntacticalError(top, col):
+  print(Fore.RED + "Syntax error on ???" + Fore.WHITE)
+
+  if(top == 7):
+    print(Fore.RED + "An id was expected" + Fore.WHITE)
 
 # --------------- Syntactical analyze --------------------------
 def syntacticalInizialization():
@@ -195,7 +198,6 @@ def syntacticalInizialization():
 
   actionTable[1][68][0] = "acc"
 
-  # --------- Juanpa -----------
   actionTable[2][48][0]="D"
   actionTable[2][48][1]="6"
   actionTable[2][67][0]="D"
@@ -329,20 +331,20 @@ def syntacticalInizialization():
   actionTable[21][13][1]="17"
   actionTable[21][67][0]="R"
   actionTable[21][67][1]="17"
-  actionTable[21][68][0]="R"
-  actionTable[21][68][1]="17"
-  actionTable[21][68][0]="R"
-  actionTable[21][68][1]="17"
-  actionTable[21][68][0]="R"
-  actionTable[21][68][1]="17"
-  actionTable[21][68][0]="R"
-  actionTable[21][68][1]="17"
-  actionTable[21][68][0]="R"
-  actionTable[21][68][1]="17"
-  actionTable[21][68][0]="R"
-  actionTable[21][68][1]="17"
-  actionTable[21][68][0]="R"
-  actionTable[21][68][1]="17"
+  actionTable[21][8][0]="R"
+  actionTable[21][8][1]="17"
+  actionTable[21][49][0]="R"
+  actionTable[21][49][1]="17"
+  actionTable[21][50][0]="R"
+  actionTable[21][50][1]="17"
+  actionTable[21][51][0]="R"
+  actionTable[21][51][1]="17"
+  actionTable[21][54][0]="R"
+  actionTable[21][54][1]="17"
+  actionTable[21][38][0]="R"
+  actionTable[21][38][1]="17"
+  actionTable[21][57][0]="R"
+  actionTable[21][57][1]="17"
 
   actionTable[22][13][0]="D"
   actionTable[22][13][1]="43"
@@ -877,36 +879,52 @@ def syntacticalInizialization():
 
   actionTable[58][13][0]="R"
   actionTable[58][13][1]="61"
+  
   actionTable[58][2][0]="R"
   actionTable[58][2][1]="61"
+  
   actionTable[58][4][0]="R"
   actionTable[58][4][1]="61"
+  
   actionTable[58][41][0]="R"
   actionTable[58][41][1]="61"
+  
   actionTable[58][40][0]="R"
   actionTable[58][40][1]="61"
+  
   actionTable[58][25][0]="R"
   actionTable[58][25][1]="61"
+  
   actionTable[58][24][0]="R"
   actionTable[58][24][1]="61"
+  
   actionTable[58][20][0]="R"
   actionTable[58][20][1]="61"
+  
   actionTable[58][22][0]="R"
   actionTable[58][22][1]="61"
+  
   actionTable[58][21][0]="R"
   actionTable[58][21][1]="61"
+  
   actionTable[58][23][0]="R"
   actionTable[58][23][1]="61"
+  
   actionTable[58][1][0]="R"
   actionTable[58][1][1]="61"
+  
   actionTable[58][39][0]="R"
   actionTable[58][39][1]="61"
+  
   actionTable[58][9][0]="D"
   actionTable[58][9][1]="97"
+  
   actionTable[58][11][0]="D"
   actionTable[58][11][1]="98"
+  
   actionTable[58][10][0]="D"
   actionTable[58][10][1]="99"
+  
   actionTable[58][6][0]="R"
   actionTable[58][6][1]="61"
 
@@ -966,7 +984,6 @@ def syntacticalInizialization():
   actionTable[60][63][0]="D"
   actionTable[60][63][1]="74"
 
-  # --------- Mario ------------
   #-------------State94------------
   actionTable[94][67][0] = "R"
   actionTable[94][67][1] = "62"
@@ -1956,8 +1973,8 @@ def syntacticalInizialization():
   actionTable[129][57][1] = "42"
 
   #-------------State130------------
-  actionTable[130][13][0] = "D"
-  actionTable[130][13][1] = "132"
+  actionTable[130][7][0] = "D"
+  actionTable[130][7][1] = "132"
 
   #-------------State131------------
   actionTable[131][13][0] = "R"
@@ -2073,7 +2090,7 @@ def syntacticalInizialization():
 
   actionTable[134][57][0] = "R"
   actionTable[134][57][1] = "37"
-  # --------- Jesus ------------
+
   actionTable[61][13][0] = "R"
   actionTable[61][13][1] = "70"
   actionTable[61][2][0] = "R"
@@ -2829,298 +2846,297 @@ def syntacticalInizialization():
   
   # ----------- Go to Table ------------------
   
-  gotoTable[0][1] = 1
-  gotoTable[0][2] = 2
+  gotoTable[0][71] = 1
+  gotoTable[0][72] = 2
 
-  gotoTable[2][3] = 3
-  gotoTable[2][4] = 4
-  gotoTable[2][8] = 5
+  gotoTable[2][73] = 3
+  gotoTable[2][74] = 4
+  gotoTable[2][78] = 5
 
-  gotoTable[6][5] = 8
-  gotoTable[6][6] = 9
+  gotoTable[6][75] = 8
+  gotoTable[6][76] = 9
 
-  gotoTable[10][7] = 13
+  gotoTable[10][77] = 13
   
-  gotoTable[11][6] = 16
-  gotoTable[11][9] = 15
+  gotoTable[11][76] = 16
+  gotoTable[11][79] = 15
 
-  gotoTable[17][7] = 19
+  gotoTable[17][77] = 19
 
-  gotoTable[20][10] = 21
+  gotoTable[20][80] = 21
   
-  gotoTable[21][4] = 23
-  gotoTable[21][11] = 22
+  gotoTable[21][74] = 23
+  gotoTable[21][81] = 22
 
-  gotoTable[22][12] = 25
-  gotoTable[22][13] = 26
-  gotoTable[22][14] = 27
-  gotoTable[22][15] = 28
-  gotoTable[22][16] = 29
-  gotoTable[22][17] = 38
-  gotoTable[22][20] = 30
-  gotoTable[22][23] = 31
-  gotoTable[22][24] = 32
-  gotoTable[22][25] = 33
-  gotoTable[22][26] = 34
+  gotoTable[22][82] = 25
+  gotoTable[22][83] = 26
+  gotoTable[22][84] = 27
+  gotoTable[22][85] = 28
+  gotoTable[22][86] = 29
+  gotoTable[22][87] = 38
+  gotoTable[22][90] = 30
+  gotoTable[22][93] = 31
+  gotoTable[22][94] = 32
+  gotoTable[22][95] = 33
+  gotoTable[22][96] = 34
 
-  gotoTable[42][17] = 66
-  gotoTable[42][27] = 52
-  gotoTable[42][28] = 53
-  gotoTable[42][29] = 54
-  gotoTable[42][30] = 55
-  gotoTable[42][32] = 56
-  gotoTable[42][34] = 57
-  gotoTable[42][36] = 58
-  gotoTable[42][38] = 59
-  gotoTable[42][39] = 60
-  gotoTable[42][40] = 61
-  gotoTable[42][41] = 67
-  gotoTable[42][42] = 68
+  gotoTable[42][87] = 66
+  gotoTable[42][97] = 52
+  gotoTable[42][98] = 53
+  gotoTable[42][99] = 54
+  gotoTable[42][100] = 55
+  gotoTable[42][102] = 56
+  gotoTable[42][104] = 57
+  gotoTable[42][106] = 58
+  gotoTable[42][108] = 59
+  gotoTable[42][109] = 60
+  gotoTable[42][110] = 61
+  gotoTable[42][111] = 67
+  gotoTable[42][112] = 68
   
-  gotoTable[44][17] = 66
-  gotoTable[44][27] = 75
-  gotoTable[44][28] = 53
-  gotoTable[44][29] = 54
-  gotoTable[44][30] = 55
-  gotoTable[44][32] = 56
-  gotoTable[44][34] = 57
-  gotoTable[44][36] = 58
-  gotoTable[44][38] = 59
-  gotoTable[44][39] = 60
-  gotoTable[44][40] = 61
-  gotoTable[44][41] = 67
-  gotoTable[44][42] = 68
+  gotoTable[44][87] = 66
+  gotoTable[44][97] = 75
+  gotoTable[44][98] = 53
+  gotoTable[44][99] = 54
+  gotoTable[44][100] = 55
+  gotoTable[44][102] = 56
+  gotoTable[44][104] = 57
+  gotoTable[44][106] = 58
+  gotoTable[44][108] = 59
+  gotoTable[44][109] = 60
+  gotoTable[44][110] = 61
+  gotoTable[44][111] = 67
+  gotoTable[44][112] = 68
 
-  gotoTable[45][17] = 66
-  gotoTable[45][18] = 76
-  gotoTable[45][27] = 77
-  gotoTable[45][28] = 53
-  gotoTable[45][29] = 54
-  gotoTable[45][30] = 55
-  gotoTable[45][32] = 56
-  gotoTable[45][34] = 57
-  gotoTable[45][36] = 58
-  gotoTable[45][38] = 59
-  gotoTable[45][39] = 60
-  gotoTable[45][40] = 61
-  gotoTable[45][41] = 67
-  gotoTable[45][42] = 68
+  gotoTable[45][87] = 66
+  gotoTable[45][88] = 76
+  gotoTable[45][97] = 77
+  gotoTable[45][98] = 53
+  gotoTable[45][99] = 54
+  gotoTable[45][100] = 55
+  gotoTable[45][102] = 56
+  gotoTable[45][104] = 57
+  gotoTable[45][106] = 58
+  gotoTable[45][108] = 59
+  gotoTable[45][109] = 60
+  gotoTable[45][110] = 61
+  gotoTable[45][111] = 67
+  gotoTable[45][112] = 68
 
-  gotoTable[49][17] = 66
-  gotoTable[49][27] = 80
-  gotoTable[49][28] = 53
-  gotoTable[49][29] = 54
-  gotoTable[49][30] = 55
-  gotoTable[49][32] = 56
-  gotoTable[49][34] = 57
-  gotoTable[49][36] = 58
-  gotoTable[49][38] = 59
-  gotoTable[49][39] = 60
-  gotoTable[49][40] = 61
-  gotoTable[49][41] = 67
-  gotoTable[49][42] = 68
+  gotoTable[49][87] = 66
+  gotoTable[49][97] = 80
+  gotoTable[49][98] = 53
+  gotoTable[49][99] = 54
+  gotoTable[49][100] = 55
+  gotoTable[49][102] = 56
+  gotoTable[49][104] = 57
+  gotoTable[49][106] = 58
+  gotoTable[49][108] = 59
+  gotoTable[49][109] = 60
+  gotoTable[49][110] = 61
+  gotoTable[49][111] = 67
+  gotoTable[49][112] = 68
 
-  gotoTable[50][11] = 81
+  gotoTable[50][81] = 81
 
-  gotoTable[55][31] = 85
+  gotoTable[55][101] = 85
 
-  gotoTable[56][33] = 88
+  gotoTable[56][103] = 88
 
-  gotoTable[57][35] = 93
+  gotoTable[57][105] = 93
 
-  gotoTable[58][37] = 96
+  gotoTable[58][107] = 96
 
-  gotoTable[60][17] = 66
-  gotoTable[60][38] = 100
-  gotoTable[60][39] = 60
-  gotoTable[60][40] = 61
-  gotoTable[60][41] = 67
-  gotoTable[60][42] = 68
+  gotoTable[60][87] = 66
+  gotoTable[60][108] = 100
+  gotoTable[60][109] = 60
+  gotoTable[60][110] = 61
+  gotoTable[60][111] = 67
+  gotoTable[60][112] = 68
 
-  gotoTable[69][17] = 66
-  gotoTable[69][27] = 101
-  gotoTable[69][28] = 53
-  gotoTable[69][29] = 54
-  gotoTable[69][30] = 55
-  gotoTable[69][32] = 56
-  gotoTable[69][34] = 57
-  gotoTable[69][36] = 58
-  gotoTable[69][38] = 59
-  gotoTable[69][39] = 60
-  gotoTable[69][40] = 61
-  gotoTable[69][41] = 67
-  gotoTable[69][42] = 68
+  gotoTable[69][87] = 66
+  gotoTable[69][97] = 101
+  gotoTable[69][98] = 53
+  gotoTable[69][99] = 54
+  gotoTable[69][100] = 55
+  gotoTable[69][102] = 56
+  gotoTable[69][104] = 57
+  gotoTable[69][106] = 58
+  gotoTable[69][108] = 59
+  gotoTable[69][109] = 60
+  gotoTable[69][110] = 61
+  gotoTable[69][111] = 67
+  gotoTable[69][112] = 68
 
-  gotoTable[70][17] = 66
-  gotoTable[70][18] = 102
-  gotoTable[70][27] = 77
-  gotoTable[70][28] = 53
-  gotoTable[70][29] = 54
-  gotoTable[70][30] = 55
-  gotoTable[70][32] = 56
-  gotoTable[70][34] = 57
-  gotoTable[70][36] = 58
-  gotoTable[70][38] = 59
-  gotoTable[70][39] = 60
-  gotoTable[70][40] = 61
-  gotoTable[70][41] = 67
-  gotoTable[70][42] = 68
+  gotoTable[70][87] = 66
+  gotoTable[70][88] = 102
+  gotoTable[70][97] = 77
+  gotoTable[70][98] = 53
+  gotoTable[70][99] = 54
+  gotoTable[70][100] = 55
+  gotoTable[70][102] = 56
+  gotoTable[70][104] = 57
+  gotoTable[70][106] = 58
+  gotoTable[70][108] = 59
+  gotoTable[70][109] = 60
+  gotoTable[70][110] = 61
+  gotoTable[70][111] = 67
+  gotoTable[70][112] = 68
 
-  gotoTable[77][19] = 105
+  gotoTable[77][89] = 105
   
-  gotoTable[81][12] = 25
-  gotoTable[81][13] = 26
-  gotoTable[81][14] = 27
-  gotoTable[81][15] = 28
-  gotoTable[81][16] = 29
-  gotoTable[81][17] = 38
-  gotoTable[81][20] = 30
-  gotoTable[81][23] = 31
-  gotoTable[81][24] = 32
-  gotoTable[81][25] = 33
-  gotoTable[81][26] = 34
+  gotoTable[81][82] = 25
+  gotoTable[81][83] = 26
+  gotoTable[81][84] = 27
+  gotoTable[81][85] = 28
+  gotoTable[81][86] = 29
+  gotoTable[81][87] = 38
+  gotoTable[81][90] = 30
+  gotoTable[81][93] = 31
+  gotoTable[81][94] = 32
+  gotoTable[81][95] = 33
+  gotoTable[81][96] = 34
 
-  #---------------------------------------Juanpa---------------------------------------
-  gotoTable[83][17] = 66
-  gotoTable[83][29] = 109
-  gotoTable[83][30] = 55
-  gotoTable[83][32] = 56
-  gotoTable[83][57] = 34
-  gotoTable[83][36] = 58
-  gotoTable[83][38] = 59
-  gotoTable[83][39] = 60
-  gotoTable[83][40] = 61
-  gotoTable[83][41] = 67
-  gotoTable[83][42] = 68
+  gotoTable[83][87] = 66
+  gotoTable[83][99] = 109
+  gotoTable[83][100] = 55
+  gotoTable[83][102] = 56
+  gotoTable[83][127] = 34
+  gotoTable[83][106] = 58
+  gotoTable[83][108] = 59
+  gotoTable[83][109] = 60
+  gotoTable[83][110] = 61
+  gotoTable[83][111] = 67
+  gotoTable[83][112] = 68
 
-  gotoTable[84][17] = 66
-  gotoTable[84][30] = 110
-  gotoTable[84][32] = 56
-  gotoTable[84][34] = 57
-  gotoTable[84][36] = 58
-  gotoTable[84][38] = 59
-  gotoTable[84][39] = 60
-  gotoTable[84][40] = 61
-  gotoTable[84][41] = 67
-  gotoTable[84][42] = 68
+  gotoTable[84][87] = 66
+  gotoTable[84][100] = 110
+  gotoTable[84][102] = 56
+  gotoTable[84][104] = 57
+  gotoTable[84][106] = 58
+  gotoTable[84][108] = 59
+  gotoTable[84][109] = 60
+  gotoTable[84][110] = 61
+  gotoTable[84][111] = 67
+  gotoTable[84][112] = 68
   
-  gotoTable[85][17] = 66
-  gotoTable[85][32] = 111
-  gotoTable[85][34] = 57
-  gotoTable[85][36] = 58
-  gotoTable[85][38] = 59
-  gotoTable[85][39] = 60
-  gotoTable[85][40] = 61
-  gotoTable[85][41] = 67
-  gotoTable[85][42] = 68
+  gotoTable[85][87] = 66
+  gotoTable[85][102] = 111
+  gotoTable[85][104] = 57
+  gotoTable[85][106] = 58
+  gotoTable[85][108] = 59
+  gotoTable[85][109] = 60
+  gotoTable[85][110] = 61
+  gotoTable[85][111] = 67
+  gotoTable[85][112] = 68
 
-  gotoTable[88][17] = 66
-  gotoTable[88][34] = 112
-  gotoTable[88][36] = 58
-  gotoTable[88][38] = 58
-  gotoTable[88][39] = 60
-  gotoTable[88][40] = 61
-  gotoTable[88][41] = 67
-  gotoTable[88][42] = 68
+  gotoTable[88][87] = 66
+  gotoTable[88][104] = 112
+  gotoTable[88][106] = 58
+  gotoTable[88][108] = 58
+  gotoTable[88][109] = 60
+  gotoTable[88][110] = 61
+  gotoTable[88][111] = 67
+  gotoTable[88][112] = 68
 
-  gotoTable[93][17] = 66
-  gotoTable[93][36] = 113
-  gotoTable[93][38] = 59
-  gotoTable[93][39] = 60
-  gotoTable[93][40] = 61
-  gotoTable[93][41] = 67
-  gotoTable[93][42] = 68
+  gotoTable[93][87] = 66
+  gotoTable[93][106] = 113
+  gotoTable[93][108] = 59
+  gotoTable[93][109] = 60
+  gotoTable[93][110] = 61
+  gotoTable[93][111] = 67
+  gotoTable[93][112] = 68
 
-  gotoTable[96][17] = 66 
-  gotoTable[96][38] = 114
-  gotoTable[96][39] = 60
-  gotoTable[96][40] = 61
-  gotoTable[96][41] = 67
-  gotoTable[96][42] = 68
+  gotoTable[96][87] = 66 
+  gotoTable[96][108] = 114
+  gotoTable[96][109] = 60
+  gotoTable[96][110] = 61
+  gotoTable[96][111] = 67
+  gotoTable[96][112] = 68
 
-  gotoTable[106][17] = 66
-  gotoTable[106][27] = 117
-  gotoTable[106][28] = 53
-  gotoTable[106][29] = 54
-  gotoTable[106][30] = 55
-  gotoTable[106][32] = 56
-  gotoTable[106][34] = 57
-  gotoTable[106][36] = 58
-  gotoTable[106][38] = 59
-  gotoTable[106][39] = 60
-  gotoTable[106][40] = 61
-  gotoTable[106][41] = 67
-  gotoTable[106][42] = 68
+  gotoTable[106][87] = 66
+  gotoTable[106][97] = 117
+  gotoTable[106][98] = 53
+  gotoTable[106][99] = 54
+  gotoTable[106][100] = 55
+  gotoTable[106][102] = 56
+  gotoTable[106][104] = 57
+  gotoTable[106][106] = 58
+  gotoTable[106][108] = 59
+  gotoTable[106][109] = 60
+  gotoTable[106][110] = 61
+  gotoTable[106][111] = 67
+  gotoTable[106][112] = 68
 
-  gotoTable[110][31] = 85 
+  gotoTable[110][101] = 85 
 
-  gotoTable[111][33] = 88
+  gotoTable[111][103] = 88
 
-  gotoTable[112][35] = 93
+  gotoTable[112][105] = 93
 
-  gotoTable[113][37] = 96
+  gotoTable[113][107] = 96
 
-  gotoTable[117][19] = 119
+  gotoTable[117][89] = 119
 
-  gotoTable[118][11] = 120
+  gotoTable[118][81] = 120
 
-  gotoTable[120][12] = 25
-  gotoTable[120][13] = 26
-  gotoTable[120][14] = 27
-  gotoTable[120][15] = 28
-  gotoTable[120][16] = 29
-  gotoTable[120][17] = 38
-  gotoTable[120][20] = 30
-  gotoTable[120][23] = 31
-  gotoTable[120][24] = 32
-  gotoTable[120][25] = 33
-  gotoTable[120][26] = 34
+  gotoTable[120][82] = 25
+  gotoTable[120][83] = 26
+  gotoTable[120][84] = 27
+  gotoTable[120][85] = 28
+  gotoTable[120][86] = 29
+  gotoTable[120][87] = 38
+  gotoTable[120][90] = 30
+  gotoTable[120][93] = 31
+  gotoTable[120][94] = 32
+  gotoTable[120][95] = 33
+  gotoTable[120][96] = 34
 
-  gotoTable[121][21] = 122
+  gotoTable[121][91] = 122
 
-  gotoTable[122][22] = 123
+  gotoTable[122][92] = 123
 
-  gotoTable[126][17] = 66
-  gotoTable[126][27] = 128
-  gotoTable[126][28] = 53
-  gotoTable[126][29] = 54
-  gotoTable[126][30] = 55
-  gotoTable[126][32] = 56
-  gotoTable[126][34] = 57
-  gotoTable[126][36] = 58
-  gotoTable[126][38] = 59
-  gotoTable[126][39] = 60
-  gotoTable[126][40] = 61
-  gotoTable[126][41] = 67
-  gotoTable[126][42] = 68
+  gotoTable[126][87] = 66
+  gotoTable[126][97] = 128
+  gotoTable[126][98] = 53
+  gotoTable[126][99] = 54
+  gotoTable[126][100] = 55
+  gotoTable[126][102] = 56
+  gotoTable[126][104] = 57
+  gotoTable[126][106] = 58
+  gotoTable[126][108] = 59
+  gotoTable[126][109] = 60
+  gotoTable[126][110] = 61
+  gotoTable[126][111] = 67
+  gotoTable[126][112] = 68
 
-  gotoTable[127][11] = 129
+  gotoTable[127][81] = 129
 
-  gotoTable[129][12] = 25
-  gotoTable[129][13] = 26
-  gotoTable[129][14] = 27
-  gotoTable[129][15] = 28
-  gotoTable[129][16] = 29
-  gotoTable[129][17] = 38
-  gotoTable[129][20] = 30
-  gotoTable[129][23] = 31
-  gotoTable[129][24] = 32
-  gotoTable[129][25] = 33
-  gotoTable[129][26] = 34
+  gotoTable[129][82] = 25
+  gotoTable[129][83] = 26
+  gotoTable[129][84] = 27
+  gotoTable[129][85] = 28
+  gotoTable[129][86] = 29
+  gotoTable[129][87] = 38
+  gotoTable[129][90] = 30
+  gotoTable[129][93] = 31
+  gotoTable[129][94] = 32
+  gotoTable[129][95] = 33
+  gotoTable[129][96] = 34
 
-  gotoTable[132][11] = 133
+  gotoTable[132][81] = 133
 
-  gotoTable[133][12] = 25
-  gotoTable[133][13] = 26
-  gotoTable[133][14] = 27
-  gotoTable[133][15] = 28
-  gotoTable[133][16] = 29
-  gotoTable[133][17] = 38
-  gotoTable[133][20] = 30
-  gotoTable[133][23] = 31
-  gotoTable[133][24] = 32
-  gotoTable[133][25] = 33
-  gotoTable[133][26] = 34
+  gotoTable[133][82] = 25
+  gotoTable[133][83] = 26
+  gotoTable[133][84] = 27
+  gotoTable[133][85] = 28
+  gotoTable[133][86] = 29
+  gotoTable[133][87] = 38
+  gotoTable[133][90] = 30
+  gotoTable[133][93] = 31
+  gotoTable[133][94] = 32
+  gotoTable[133][95] = 33
+  gotoTable[133][96] = 34
   
   # Grammar
 
@@ -3189,7 +3205,7 @@ def syntacticalInizialization():
   SLRGrammar.append(Grammar("expr-add","expr-mul"))
   SLRGrammar.append(Grammar("op-add","+"))
   SLRGrammar.append(Grammar("op-add","-"))
-  SLRGrammar.append(Grammar("expr-mul","exr-mul op-mul expr-unary"))
+  SLRGrammar.append(Grammar("expr-mul","expr-mul op-mul expr-unary"))
   SLRGrammar.append(Grammar("expr-mul","expr-unary"))
   SLRGrammar.append(Grammar("op-mul","*"))
   SLRGrammar.append(Grammar("op-mul","/"))
@@ -3208,7 +3224,7 @@ def syntacticalInizialization():
   SLRGrammar.append(Grammar("lit","lit-bool"))
   SLRGrammar.append(Grammar("lit","lit-int"))
   SLRGrammar.append(Grammar("lit","lit-char"))
-  SLRGrammar.append(Grammar("lit","str"))
+  SLRGrammar.append(Grammar("lit","lit-str"))
 
 def syntacticalAnalyze():
   global column
@@ -3219,7 +3235,7 @@ def syntacticalAnalyze():
   global pos
   global currToken
   currToken = tokenList[pos]
-  nextToken = tokenList[pos]
+  nextToken = None
   #Iterative process
   global asked
   asked = False
@@ -3251,10 +3267,10 @@ def syntacticalAnalyze():
         column = 68
 
     print("actionTable[stackTop][column][0]", stackTop, column, actionTable[stackTop][column][0])
+    print(stack)
     if(actionTable[stackTop][column][0] == 0):
       syntaxError = True
-      print("ERROR") 
-      #GestionarError(stackTop, colum)
+      syntacticalError(stackTop, column)
     else:
       if(actionTable[stackTop][column][0] == 'D'):
         print("Shifting")
@@ -3265,7 +3281,7 @@ def syntacticalAnalyze():
           reduce(stackTop, column)
         else:
           if(actionTable[stackTop][column][0] == "acc"):
-            print("Accepted")
+            print(Fore.BLUE + "Accepted" + Fore.WHITE)
             compiled = True
     
 # ------------------- Driver code ------------------------------
@@ -3285,11 +3301,12 @@ def shift(f, c):
   global stack
   
   num = int(actionTable[f][c][1])
-  stack.append(currToken)
-  stack.append(str(num))
+  stack.append(tokenList[pos])
+  stack.append(num)
 
   if(asked == False):
-    currToken = tokenList[pos]
+    if(pos < len(tokenList)):
+      currToken = tokenList[pos]
   else:
     currToken = nextToken
     asked = False
@@ -3297,7 +3314,6 @@ def shift(f, c):
   column = -1
   
 def reduce(f, c):
-  global prods
   global stack
   
   nonTerminal = SLRGrammar[int(actionTable[f][c][1])].var
@@ -3313,18 +3329,19 @@ def reduce(f, c):
 
   # -----------Debugging purposes only ------------
   prod = ""
-  prod = prod + nonTerminal + "->"
+  prod = prod + nonTerminal + " -> "
   if(SLRGrammar[int(actionTable[f][c][1])].prod == '@'):
     prod = prod + "null\n"
   else:
     prod = prod + SLRGrammar[int(actionTable[f][c][1])].prod + "\n"
   # -----------------------------------------------
 
-  x = int(stack[len(stack)-1])
+  x = int(stack[-1])
   stack.append(nonTerminal)
   goNum = gotoTable[x][nonTerminals[nonTerminal]]
   stack.append(goNum)
-  
+
 readFile()
 lexicalAnalize()
 syntacticalAnalyze()
+#print(tokenList)

@@ -1,11 +1,9 @@
+/* File: 001_hello.quetzal
+   The classical "hello, world" program.
+   (C) 2022 Ariel Ortiz, ITESM CEM.
+*/
+
 main() {
-
-
-    assert(0, false or false, "error in logical OR");
-    /*assert(1, true or false, "error in logical OR");
-    assert(1, false or true, "error in logical OR");
-    assert(1, true or true, "error in logical OR");
-    assert(1, true_fun() or never_called(), "error in logical OR");*/
-
-    
+    prints("hello, world\n");;;
+    return 42;;;
 }

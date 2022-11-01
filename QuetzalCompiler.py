@@ -188,7 +188,7 @@ def tokenValidation(token, line):
 def lexicalError(token, line):
   print(Fore.RED)
   if(stringMode == True):
-    print("Error at line " + str(line) + " maybe a quote is missing?")
+    print("Error at line " + str(line-1) + " maybe a quote is missing?")
   else:
     print("Error: Non recognized " + token + " at line " + str(line))
   print(Fore.WHITE)

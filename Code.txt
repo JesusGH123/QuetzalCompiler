@@ -107,5 +107,5 @@ main() {
     printi(fails);
     prints(" failure(s) found in ");
     printi(asserts);
-    prints(" assertion(s).\n");
+    prints(" assertion(s).\n";
 }

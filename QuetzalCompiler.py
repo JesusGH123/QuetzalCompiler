@@ -19,6 +19,7 @@ nonTerminals = SymbolTable.nonTerminals
 
 #Variables
 readedTokens = []  #For lexical analyzing
+stringMode = False
 
 currToken = None
 ROWS = 144
@@ -48,8 +49,8 @@ def readFile():
 
 # ----------------- Lexical analyze ----------------------------
 def lexicalAnalize():
+  global stringMode
   delimitedComment = False
-  stringMode = False
   currLine = 1
 
   for line in file:
@@ -185,8 +186,12 @@ def tokenValidation(token, line):
   #print(token, 67)
 
 def lexicalError(token, line):
-  print(Fore.RED + "Error: Non recognized " + token + " at line " + line +
-        Fore.WHITE)
+  print(Fore.RED)
+  if(stringMode == True):
+    print("Error at line " + str(line) + " maybe a quote is missing?")
+  else:
+    print("Error: Non recognized " + token + " at line " + str(line))
+  print(Fore.WHITE)
   exit(-1)
 
 def syntacticalError(top, col):
@@ -210,7 +215,7 @@ def syntacticalError(top, col):
     elif (top == 71):
       print("at program's structure")
     elif (top == 72):
-      print("wrong the definition list")
+      print("wrong definition list")
     elif (top == 73):
       print("wrong definition")
     elif (top == 74):

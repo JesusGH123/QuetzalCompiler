@@ -72,7 +72,7 @@ main() {
     assert(-42, -80 - -38, "error in substraction");
 
     assert(0, not true, "error in logical NOT");
-    assert(1, not false, "error in logical NOT");
+    assert(1 not false, "error in logical NOT");
     assert(0, not not not true, "error in logical NOT");
 
     assert(0, false and false, "error in logical AND");

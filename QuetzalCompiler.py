@@ -3423,7 +3423,8 @@ def shift(f, c):
   global stack
 
   num = int(actionTable[f][c][1])
-  treeStack.append(Node(tokenList[pos][0],[]))
+  print("Value: ", tokenList[pos][0])
+  treeStack.append(Node(dictToken[tokenList[pos][0]],[]))
   stack.append(tokenList[pos][0])
   stack.append(num)
   print(stack)

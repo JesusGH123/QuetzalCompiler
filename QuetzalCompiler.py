@@ -46,7 +46,7 @@ class Grammar:
 
 def readFile():
   global file
-  with open("Code.txt") as f:
+  with open(sys.argv[1]) as f:
     file = f.readlines()
 
 # ----------------- Lexical analyze ----------------------------

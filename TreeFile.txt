@@ -1,67 +1,66 @@
-.
-└── program
-    └── def-list
-        ├── def
-        │   └── fun-def
-        │       ├── }
-        │       ├── stmt-list
-        │       │   ├── stmt
-        │       │   │   └── stmt-empty
-        │       │   │       └── ;
-        │       │   └── stmt-list
-        │       │       ├── stmt
-        │       │       │   └── stmt-empty
-        │       │       │       └── ;
-        │       │       └── stmt-list
-        │       │           ├── stmt
-        │       │           │   └── stmt-return
-        │       │           │       ├── ;
-        │       │           │       ├── expr
-        │       │           │       │   └── expr-or
-        │       │           │       │       └── expr-and
-        │       │           │       │           └── expr-comp
-        │       │           │       │               └── expr-rel
-        │       │           │       │                   └── expr-add
-        │       │           │       │                       └── expr-mul
-        │       │           │       │                           └── expr-unary
-        │       │           │       │                               └── expr-primary
-        │       │           │       │                                   └── lit
-        │       │           │       │                                       └── lit-int
-        │       │           │       └── return
-        │       │           └── stmt-list
-        │       │               ├── stmt
-        │       │               │   └── stmt-empty
-        │       │               │       └── ;
-        │       │               └── stmt-list
-        │       │                   ├── stmt
-        │       │                   │   └── stmt-empty
-        │       │                   │       └── ;
-        │       │                   └── stmt-list
-        │       │                       ├── stmt
-        │       │                       │   └── stmt-fun-call
-        │       │                       │       ├── ;
-        │       │                       │       └── fun-call
-        │       │                       │           ├── )
-        │       │                       │           ├── expr-list
-        │       │                       │           │   ├── expr-list-cont
-        │       │                       │           │   └── expr
-        │       │                       │           │       └── expr-or
-        │       │                       │           │           └── expr-and
-        │       │                       │           │               └── expr-comp
-        │       │                       │           │                   └── expr-rel
-        │       │                       │           │                       └── expr-add
-        │       │                       │           │                           └── expr-mul
-        │       │                       │           │                               └── expr-unary
-        │       │                       │           │                                   └── expr-primary
-        │       │                       │           │                                       └── lit
-        │       │                       │           │                                           └── lit-str
-        │       │                       │           ├── (
-        │       │                       │           └── id
-        │       │                       └── stmt-list
-        │       ├── var-def-list
-        │       ├── {
-        │       ├── )
-        │       ├── param-list
-        │       ├── (
-        │       └── id
-        └── def-list
+# program
+## def-list
+### def
+#### fun-def
+##### }
+##### stmt-list
+###### stmt
+####### stmt-empty
+######## ;
+###### stmt-list
+####### stmt
+######## stmt-empty
+######### ;
+####### stmt-list
+######## stmt
+######### stmt-return
+########## ;
+########## expr
+########### expr-or
+############ expr-and
+############# expr-comp
+############## expr-rel
+############### expr-add
+################ expr-mul
+################# expr-unary
+################## expr-primary
+################### lit
+#################### lit-int
+########## return
+######## stmt-list
+######### stmt
+########## stmt-empty
+########### ;
+######### stmt-list
+########## stmt
+########### stmt-empty
+############ ;
+########## stmt-list
+########### stmt
+############ stmt-fun-call
+############# ;
+############# fun-call
+############## )
+############## expr-list
+############### expr-list-cont
+############### expr
+################ expr-or
+################# expr-and
+################## expr-comp
+################### expr-rel
+#################### expr-add
+##################### expr-mul
+###################### expr-unary
+####################### expr-primary
+######################## lit
+######################### lit-str
+############## (
+############## id
+########### stmt-list
+##### var-def-list
+##### {
+##### )
+##### param-list
+##### (
+##### id
+### def-list

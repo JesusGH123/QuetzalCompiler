@@ -200,104 +200,109 @@ def syntacticalError(top, col):
   global analyzedLine  #Line in which the error occurs
   print(Fore.RED + "Syntax error on line " + str(analyzedLine))
 
-  print("Stack= ", stack)
-  print("stackTop", top)
-
   if (top < 70): ##For terminals
     nextToken = getNextToken()
     
-    if (top == nextToken):
+    if (top <= nextToken):
       print("possible extra token")
     else:
       print("possible missing token")
   else:  ##For Non terminals
-    
-    if (top == 70):
-      print("at the program's beginning")
-    elif (top == 71):
-      print("at program's structure")
-    elif (top == 72):
-      print("wrong definition list")
-    elif (top == 73):
-      print("wrong definition")
-    elif (top == 74):
-      print("wrong variable definition")
-    elif (top == 75):
-      print("wrong variable list ")
-    elif (top == 76):
-      print("wrong list identifier")
-    elif (top == 77):
-      print("wrong list- cont identifier")
-    elif (top == 78):
-      print("wrong funtion definition")
-    elif (top == 79):
-      print("wrong paremeters of the list")
-    elif (top == 80):
-      print("wrong variable definition list")
-    elif (top == 81):
-      print("wrong statement's list")
-    elif (top == 82):
-      print("wrong statement")
-    elif (top == 83):
-      print("wrong assigment of the statement")
-    elif (top == 84):
-      print("wrong statement's increment")
-    elif (top == 85):
-      print("wrong statement's decrement ")
-    elif (top == 86):
-      print("wrong statement's funtion call")
-    elif (top == 87):
-      print("wrong funtion call")
-    elif (top == 88):
-      print("wrong expression list")
-    elif (top == 89):
-      print("wrong the expresion content list")
-    elif (top == 90):
-      print("wrong if statement")
-    elif (top == 91):
-      print("wrong else statement")
-    elif (top == 92):
-      print("wrong else stmt")
-    elif (top == 93):
-      print("wrong loop statement")
-    elif (top == 94):
-      print("wrong break statement")
-    elif (top == 95):
-      print("wrong return statement")
-    elif (top == 96):
-      print("wrong empty statement")
-    elif (top == 97):
-      print("wrong expression")
-    elif (top == 98):
-      print("wrong expression or ")
-    elif (top == 99):
-      print("wrong expression and")
-    elif (top == 100):
-      print("wrong expression comp")
-    elif (top == 101):
-      print("wrong operation comp")
-    elif (top == 102):
-      print("wrong expression rel")
-    elif (top == 103):
-      print("wrong operation rel")
-    elif (top == 104):
-      print("wrong expression add")
-    elif (top == 105):
-      print("wrong operation add")
-    elif (top == 106):
-      print("wrong expression mul")
-    elif (top == 107):
-      print("wrong operation mul")
-    elif (top == 108):
-      print("wrong expression unary")
-    elif (top == 109):
-      print("wrong operation unary")
-    elif (top == 110):
-      print("wrong expression primary")
-    elif (top == 111):
-      print("wrong array")
-    elif (top == 112):
-      print("wrong literal")
+    nextCol = getNextToken()
+    topNext = stack[-2]
+
+    if(actionTable[top][nextCol][0] != 0):
+      if(topNext == getToken()):
+        print("possible missing token")
+      else:
+        print("possible extra token")
+    else:
+      if (top == 70):
+        print("at the program's beginning")
+      elif (top == 71):
+        print("at program's structure")
+      elif (top == 72):
+        print("wrong definition list")
+      elif (top == 73):
+        print("wrong definition")
+      elif (top == 74):
+        print("wrong variable definition")
+      elif (top == 75):
+        print("wrong variable list ")
+      elif (top == 76):
+        print("wrong list identifier")
+      elif (top == 77):
+        print("wrong list- cont identifier")
+      elif (top == 78):
+        print("wrong funtion definition")
+      elif (top == 79):
+        print("wrong paremeters of the list")
+      elif (top == 80):
+        print("wrong variable definition list")
+      elif (top == 81):
+        print("wrong statement's list")
+      elif (top == 82):
+        print("wrong statement")
+      elif (top == 83):
+        print("wrong assigment of the statement")
+      elif (top == 84):
+        print("wrong statement's increment")
+      elif (top == 85):
+        print("wrong statement's decrement ")
+      elif (top == 86):
+        print("wrong statement's funtion call")
+      elif (top == 87):
+        print("wrong funtion call")
+      elif (top == 88):
+        print("wrong expression list")
+      elif (top == 89):
+        print("wrong the expresion content list")
+      elif (top == 90):
+        print("wrong if statement")
+      elif (top == 91):
+        print("wrong else statement")
+      elif (top == 92):
+        print("wrong else stmt")
+      elif (top == 93):
+        print("wrong loop statement")
+      elif (top == 94):
+        print("wrong break statement")
+      elif (top == 95):
+        print("wrong return statement")
+      elif (top == 96):
+        print("wrong empty statement")
+      elif (top == 97):
+        print("wrong expression")
+      elif (top == 98):
+        print("wrong expression or ")
+      elif (top == 99):
+        print("wrong expression and")
+      elif (top == 100):
+        print("wrong expression comp")
+      elif (top == 101):
+        print("wrong operation comp")
+      elif (top == 102):
+        print("wrong expression rel")
+      elif (top == 103):
+        print("wrong operation rel")
+      elif (top == 104):
+        print("wrong expression add")
+      elif (top == 105):
+        print("wrong operation add")
+      elif (top == 106):
+        print("wrong expression mul")
+      elif (top == 107):
+        print("wrong operation mul")
+      elif (top == 108):
+        print("wrong expression unary")
+      elif (top == 109):
+        print("wrong operation unary")
+      elif (top == 110):
+        print("wrong expression primary")
+      elif (top == 111):
+        print("wrong array")
+      elif (top == 112):
+        print("wrong literal")
 
   print(Fore.WHITE)
   exit(-1)
@@ -3411,6 +3416,16 @@ def getNextToken():
 
   if (pos < len(tokenList) - 1):
     pos = pos + 1
+    analyzedLine = tokenList[pos][1]
+    return tokenList[pos][0]
+  else:
+    return 68
+
+def getToken():
+  global pos
+  global analyzedLine
+
+  if (pos < len(tokenList) - 1):
     analyzedLine = tokenList[pos][1]
     return tokenList[pos][0]
   else:

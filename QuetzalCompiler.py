@@ -33,6 +33,7 @@ SLRGrammar = []
 pos = -1
 column = -1
 stack = [0]
+treeStack=[]
 analyzedLine = 1
 
 
@@ -3421,6 +3422,7 @@ def shift(f, c):
   global stack
 
   num = int(actionTable[f][c][1])
+  treeStack.append(Node(tokenList[pos][0],[]))
   stack.append(tokenList[pos][0])
   stack.append(num)
   print(stack)
@@ -3433,6 +3435,12 @@ def shift(f, c):
     asked = False
 
   column = -1
+class Node:
+  def __init__(self, val,chn) -> None:
+    self.val=val
+    self.chn=chn
+
+
 
 def reduce(f, c):
   global stack
@@ -3446,7 +3454,12 @@ def reduce(f, c):
     deletingNum = len(SLRGrammar[int(
       actionTable[f][c][1])].prod.split(' ')) * 2
 
+  chn=[]
   for i in range(deletingNum):
+    if (i & 1) :
+      chn.append(treeStack[-1])
+      treeStack.pop()
+
     stack.pop()
 
   # -----------Debugging purposes only ------------
@@ -3461,11 +3474,19 @@ def reduce(f, c):
 
   x = int(stack[-1])
   stack.append(nonTerminal)
+  treeStack.append(Node(nonTerminal, chn))
   goNum = gotoTable[x][nonTerminals[nonTerminal]]
   stack.append(goNum)
 
+def printTree(node, level,f):
+    print('#'*level ,node.val,file=f)
+    for ch in node.chn:
+      printTree(ch, level+1, f)
+  
 # ------------------- Driver code ------------------------------
 
 readFile() # Open and red the file
 lexicalAnalize() #Lexical analyze
 syntacticalAnalyze() #Syntactical analyze
+with open ('./TreeFile.txt', mode='w') as f:
+  printTree(treeStack[-1], 1,f)

@@ -1,0 +1,67 @@
+.
+└── program
+    └── def-list
+        ├── def
+        │   └── fun-def
+        │       ├── 8
+        │       ├── stmt-list
+        │       │   ├── stmt
+        │       │   │   └── stmt-empty
+        │       │   │       └── 13
+        │       │   └── stmt-list
+        │       │       ├── stmt
+        │       │       │   └── stmt-empty
+        │       │       │       └── 13
+        │       │       └── stmt-list
+        │       │           ├── stmt
+        │       │           │   └── stmt-return
+        │       │           │       ├── 13
+        │       │           │       ├── expr
+        │       │           │       │   └── expr-or
+        │       │           │       │       └── expr-and
+        │       │           │       │           └── expr-comp
+        │       │           │       │               └── expr-rel
+        │       │           │       │                   └── expr-add
+        │       │           │       │                       └── expr-mul
+        │       │           │       │                           └── expr-unary
+        │       │           │       │                               └── expr-primary
+        │       │           │       │                                   └── lit
+        │       │           │       │                                       └── 64
+        │       │           │       └── 57
+        │       │           └── stmt-list
+        │       │               ├── stmt
+        │       │               │   └── stmt-empty
+        │       │               │       └── 13
+        │       │               └── stmt-list
+        │       │                   ├── stmt
+        │       │                   │   └── stmt-empty
+        │       │                   │       └── 13
+        │       │                   └── stmt-list
+        │       │                       ├── stmt
+        │       │                       │   └── stmt-fun-call
+        │       │                       │       ├── 13
+        │       │                       │       └── fun-call
+        │       │                       │           ├── 4
+        │       │                       │           ├── expr-list
+        │       │                       │           │   ├── expr-list-cont
+        │       │                       │           │   └── expr
+        │       │                       │           │       └── expr-or
+        │       │                       │           │           └── expr-and
+        │       │                       │           │               └── expr-comp
+        │       │                       │           │                   └── expr-rel
+        │       │                       │           │                       └── expr-add
+        │       │                       │           │                           └── expr-mul
+        │       │                       │           │                               └── expr-unary
+        │       │                       │           │                                   └── expr-primary
+        │       │                       │           │                                       └── lit
+        │       │                       │           │                                           └── 63
+        │       │                       │           ├── 3
+        │       │                       │           └── 67
+        │       │                       └── stmt-list
+        │       ├── var-def-list
+        │       ├── 7
+        │       ├── 4
+        │       ├── param-list
+        │       ├── 3
+        │       └── 67
+        └── def-list

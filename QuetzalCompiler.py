@@ -11,6 +11,7 @@ import re
 from colorama import Fore
 
 skippedCharacters = SymbolTable.skippedCharacters
+dictToken = SymbolTable.tokens
 separators = SymbolTable.separators
 reservedWords = SymbolTable.reservedWords
 alphabet = SymbolTable.alphabet

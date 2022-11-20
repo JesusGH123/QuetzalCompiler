@@ -37,7 +37,6 @@ stack = [0]
 treeStack=[]
 analyzedLine = 1
 
-
 class Grammar:
 
   def __init__(self, var, prod):
@@ -48,6 +47,22 @@ def readFile():
   global file
   with open(sys.argv[1]) as f:
     file = f.readlines()
+
+class Node:
+  def __init__(self, val, chn):
+    self.val = val
+    self.chn = chn
+
+class scopeNode:
+  def __init__(self, parent, table):
+    self.parent = parent
+    self.table = table 
+
+class scopeTableRow:
+  def __init__(self, type):
+    self.type = type
+
+currNode = scopeNode(None, {})  #Initializing symbol table tree
 
 # ----------------- Lexical analyze ----------------------------
 def lexicalAnalize():
@@ -184,8 +199,7 @@ def tokenValidation(token, line):
       lexicalError(token, line)
 
   #It is an ID
-  tokenList.append((67, line))
-  #print(token, 67)
+  tokenList.append((67, line, token))
 
 def lexicalError(token, line):
   print(Fore.RED)
@@ -3431,6 +3445,9 @@ def getToken():
   else:
     return 68
 
+#def tryAddingSymbol(nonTerminal, chn):
+  #if(is in currNode.table)
+
 def shift(f, c):
   global asked
   global currToken
@@ -3439,7 +3456,8 @@ def shift(f, c):
 
   num = int(actionTable[f][c][1])
   print("Value: ", tokenList[pos][0])
-  treeStack.append(Node(dictToken[tokenList[pos][0]],[]))
+  newNode = Node(dictToken[tokenList[pos][0]], [Node(tokenList[pos][2], [])] if(tokenList[pos][0] == 67) else [] )
+  treeStack.append(newNode)
   stack.append(tokenList[pos][0])
   stack.append(num)
   print(stack)
@@ -3452,10 +3470,6 @@ def shift(f, c):
     asked = False
 
   column = -1
-class Node:
-  def __init__(self, val,chn) -> None:
-    self.val=val
-    self.chn=chn
 
 def reduce(f, c):
   global stack
@@ -3490,6 +3504,8 @@ def reduce(f, c):
 
   x = int(stack[-1])
   stack.append(nonTerminal)
+  #if (nonTerminal == "fun_def"):
+    #tryAddingSymbol(nonTerminal, chn)
   treeStack.append(Node(nonTerminal, chn))
   goNum = gotoTable[x][nonTerminals[nonTerminal]]
   stack.append(goNum)

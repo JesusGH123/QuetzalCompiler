@@ -3457,8 +3457,6 @@ class Node:
     self.val=val
     self.chn=chn
 
-
-
 def reduce(f, c):
   global stack
 
@@ -3476,8 +3474,9 @@ def reduce(f, c):
     if (i & 1) :
       chn.append(treeStack[-1])
       treeStack.pop()
-
     stack.pop()
+
+  chn = reversed(chn)
 
   # -----------Debugging purposes only ------------
   prod = ""
@@ -3505,5 +3504,5 @@ def printTree(node, level,f):
 readFile() # Open and red the file
 lexicalAnalize() #Lexical analyze
 syntacticalAnalyze() #Syntactical analyze
-with open ('./TreeFile.txt', mode='w') as f:
+with open ('./TreeFile.txt', mode='w') as f:  #Print the tree
   printTree(treeStack[-1], 1,f)

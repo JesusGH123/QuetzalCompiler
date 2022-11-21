@@ -49,9 +49,10 @@ def readFile():
     file = f.readlines()
 
 class Node:
-  def __init__(self, val, chn):
+  def __init__(self, val, chn, parent):
     self.val = val
     self.chn = chn
+    self.parent = parent
 
 class scopeNode:
   def __init__(self, parent, table):
@@ -61,6 +62,10 @@ class scopeNode:
 class scopeTableRow:
   def __init__(self, type):
     self.type = type
+  def __repr__(self):
+    return "ScopeTable()"
+  def __str__(self):
+    return self.type
 
 currNode = scopeNode(None, {})  #Initializing symbol table tree
 
@@ -3388,8 +3393,7 @@ def syntacticalAnalyze():
 
   syntacticalInizialization()
 
-  while (len(tokenList) >= 0 and compiled == False and exitCompiler == False
-         and syntaxError == False):
+  while (len(tokenList) >= 0 and compiled == False and exitCompiler == False and syntaxError == False):
     # ---- Debugging purposes -------
     currentStack = ""
     for i in range(len(stack)):
@@ -3445,22 +3449,39 @@ def getToken():
   else:
     return 68
 
-#def tryAddingSymbol(nonTerminal, chn):
-  #if(is in currNode.table)
+def tryAddingSymbolFunction(nonTerminal, chn):
+  tokenId = chn[0].chn[0].val
+  if(tokenId in currNode.table): #Redefined function
+    print(Fore.RED  + tokenId + " function is already defined " + Fore.WHITE)
+    exit(-1)
+  currNode.table[tokenId] = scopeTableRow(nonTerminal)
+
+def tryAddingSymbolVariable(nonTerminal, chn, pos):
+  tokenId = chn[pos].chn[0].val
+  if(tokenId in currNode.table): #Redefined function
+    print(Fore.RED  + tokenId + " variable is already defined " + Fore.WHITE)
+    exit(-1)
+  currNode.table[tokenId] = scopeTableRow(nonTerminal)
 
 def shift(f, c):
   global asked
   global currToken
   global column
   global stack
+  global currNode
 
   num = int(actionTable[f][c][1])
   print("Value: ", tokenList[pos][0])
-  newNode = Node(dictToken[tokenList[pos][0]], [Node(tokenList[pos][2], [])] if(tokenList[pos][0] == 67) else [] )
+  newNode = Node(dictToken[tokenList[pos][0]], [Node(tokenList[pos][2], [])] if(tokenList[pos][0] == 67) else [], None)
   treeStack.append(newNode)
   stack.append(tokenList[pos][0])
   stack.append(num)
   print(stack)
+
+  if((tokenList[pos][0] == 7 and ) or tokenList[pos][0] == 79):
+    currNode = scopeNode(currNode, {})
+  elif(tokenList[pos][0] == 8):
+    currNode = currNode.parent
 
   if (asked == False):
     if (pos < len(tokenList)):
@@ -3490,7 +3511,7 @@ def reduce(f, c):
       treeStack.pop()
     stack.pop()
 
-  chn = reversed(chn)
+  chn = list(reversed(chn))
 
   # -----------Debugging purposes only ------------
   prod = ""
@@ -3504,8 +3525,12 @@ def reduce(f, c):
 
   x = int(stack[-1])
   stack.append(nonTerminal)
-  #if (nonTerminal == "fun_def"):
-    #tryAddingSymbol(nonTerminal, chn)
+  if (nonTerminal == "fun-def"):
+    tryAddingSymbolFunction(nonTerminal, chn)
+  elif(nonTerminal == "id-list"):
+    tryAddingSymbolVariable(nonTerminal, chn, 0)
+  elif(len(chn) > 0 and nonTerminal == "id-list-cont"):
+    tryAddingSymbolVariable(nonTerminal, chn, 1)
   treeStack.append(Node(nonTerminal, chn))
   goNum = gotoTable[x][nonTerminals[nonTerminal]]
   stack.append(goNum)

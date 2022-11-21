@@ -9,7 +9,7 @@ sqr(x) {
 }
 
 main() {
-    var array, sum, i, j, x;
+    var array, sum, i, j, x, i;
     sum = 0;
     i = 0;
     
@@ -17,29 +17,8 @@ main() {
         if (i >= size(array)) {
             break;
         }
-        x = get(array, i);
-        inc i;
-        if (x == 99) {
-            break;
-        }
-        if (x <= 2) {
-        } else {
-            j = 1;
-            loop {
-                inc j;
-                if (j > x) {
-                    break;
-                } elif (x == j) {
-                    sum = sum + x;
-                } elif (x % j == 0) {
-                    break;
-                }
-            }
-        }
+        
     }
-    if (sum == 88) {
-        prints("The program works fine!\n");
-    } else {
-        prints("This program sucks!\n");
-    }
+    
+    prints("The program works fine!\n");
 }

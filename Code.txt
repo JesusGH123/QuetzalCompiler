@@ -4,20 +4,18 @@ sqr() {
 var x;
 
 sqr(x,y) {
-    
     return x * y;
 }
 
 main() {
     var sqr, array, sum, j, i, x;
-    sum = 0;
+    sum = -2147483649;
     i = 0;
     
     loop {
         if (i >= size(array)) {
-            break;
+            //break;
         }
-        
     }
 
     prints("The program works fine!\n");

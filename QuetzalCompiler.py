@@ -165,6 +165,13 @@ def literalValidaton(token, line):
     tokenList.append((63, line))
     #print(token, 63)
   elif (re.match(r'(^[\+|\-]?[0-9]*$)', token)):  #Numeric literal (64)
+    tokenCopy = token
+    if(token[0] == '-' or token[0] == '+'):
+      tokenCopy = tokenCopy[1:]
+    if(len(tokenCopy) > 10 or int(token) < -2_147_483_648 or int(token) > 2_147_483_647):
+      print(Fore.RED + f"Int literal {token} out of bounds" + Fore.WHITE)
+      exit(-1)
+    
     tokenList.append((64, line))
     #print(token, 64)
   elif (token == "false" or token == "true"):  #Boolean literal (65)
@@ -3551,8 +3558,12 @@ def reduce(f, c):
   stack.append(goNum)
 
 # --------------------- Semantical analyze --------------------------------
-def printTree(node, level, f, parent):
+def printTree(node, level, f, parent, insideLoop = False):
   global currNode
+
+  if(node.val == "stmt-break" and not insideLoop):
+    print(Fore.RED + "Break statement can only be used in loop statements" + Fore.WHITE)
+    exit(-1)
 
   if((node.val == "{" and parent.val != "fun-def") or node.val == "param-list"):
     currNode = scopeNode(currNode, set())
@@ -3584,7 +3595,7 @@ def printTree(node, level, f, parent):
 
   print('#'*level ,node.val, file=f)
   for ch in node.chn:
-    printTree(ch, level+1, f, node)
+    printTree(ch, level+1, f, node, insideLoop or node.val == "stmt-loop")
 
   if (node.val == "fun-call" and (node.chn[0].chn[0].val, 'F', node.paramCount) not in rootNode.table): #Check if the function does not exists
     print(Fore.RED + "The function " + node.chn[0].chn[0].val + f'({node.paramCount})' + " is not declared "+ Fore.WHITE)
@@ -3600,7 +3611,6 @@ def handleSemanticErrors(node):
         print(Fore.RED + "Variable " + id + " does not exist" + Fore.WHITE)
         exit(-1)
       
-
   for ch in node.chn:
     handleSemanticErrors(ch)
   

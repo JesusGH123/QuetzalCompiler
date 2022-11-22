@@ -37,8 +37,9 @@ stack = [0]
 treeStack=[]
 analyzedLine = 1
 
-class Grammar:
+mainNotDefined = True
 
+class Grammar:
   def __init__(self, var, prod):
     self.var = var
     self.prod = prod
@@ -49,25 +50,30 @@ def readFile():
     file = f.readlines()
 
 class Node:
-  def __init__(self, val, chn, parent):
+  def __init__(self, val, chn, idCount, paramCount):
     self.val = val
     self.chn = chn
-    self.parent = parent
+    self.idCount = idCount
+    self.paramCount = paramCount
+    self.found = False
 
 class scopeNode:
   def __init__(self, parent, table):
     self.parent = parent
-    self.table = table 
+    self.table = table
 
-class scopeTableRow:
-  def __init__(self, type):
-    self.type = type
-  def __repr__(self):
-    return "ScopeTable()"
-  def __str__(self):
-    return self.type
-
-currNode = scopeNode(None, {})  #Initializing symbol table tree
+currNode = scopeNode(None, {("printi", 'F', 1),
+                            ("printc", 'F', 1),
+                            ("prints", 'F', 1),
+                            ("println", 'F', 0),
+                            ("readi", 'F', 0),
+                            ("reads", 'F', 0),
+                            ("new", 'F', 1),
+                            ("size", 'F', 1),
+                            ("add", 'F', 2),
+                            ("get", 'F', 2),
+                            ("set", 'F', 3)})  #Initializing symbol table tree
+rootNode = currNode
 
 # ----------------- Lexical analyze ----------------------------
 def lexicalAnalize():
@@ -3425,7 +3431,7 @@ def syntacticalAnalyze():
           reduce(stackTop, column)
         else:
           if (actionTable[stackTop][column][0] == "acc"):
-            print(Fore.BLUE + "Accepted" + Fore.WHITE)
+            print(Fore.BLUE + "Syntax accepted" + Fore.WHITE + "\n")
             compiled = True
 
 def getNextToken():
@@ -3450,38 +3456,43 @@ def getToken():
     return 68
 
 def tryAddingSymbolFunction(nonTerminal, chn):
-  tokenId = chn[0].chn[0].val
+  global mainNotDefined
+
+  tokenId = (chn[0].chn[0].val, 'F', chn[2].idCount)
+  
   if(tokenId in currNode.table): #Redefined function
-    print(Fore.RED  + tokenId + " function is already defined " + Fore.WHITE)
+    print(Fore.RED  + tokenId[0] + " function is already defined " + Fore.WHITE)
     exit(-1)
-  currNode.table[tokenId] = scopeTableRow(nonTerminal)
+  
+  if(tokenId[0] == "main"):
+    if(tokenId[2] != 0):
+      print(Fore.RED + 'Function "main" can not have parameters' + Fore.WHITE)
+      exit(-1)
+    mainNotDefined = False
+
+  currNode.table.add(tokenId)
 
 def tryAddingSymbolVariable(nonTerminal, chn, pos):
-  tokenId = chn[pos].chn[0].val
+  tokenId = (chn[pos].chn[0].val, 'V')
   if(tokenId in currNode.table): #Redefined function
-    print(Fore.RED  + tokenId + " variable is already defined " + Fore.WHITE)
+    print(Fore.RED  + tokenId[0] + " variable is already defined " + Fore.WHITE)
     exit(-1)
-  currNode.table[tokenId] = scopeTableRow(nonTerminal)
+  
+  currNode.table.add(tokenId)
 
 def shift(f, c):
   global asked
   global currToken
   global column
   global stack
-  global currNode
 
   num = int(actionTable[f][c][1])
   print("Value: ", tokenList[pos][0])
-  newNode = Node(dictToken[tokenList[pos][0]], [Node(tokenList[pos][2], [])] if(tokenList[pos][0] == 67) else [], None)
+  newNode = Node(dictToken[tokenList[pos][0]], [Node(tokenList[pos][2], [], 0, 0)] if(tokenList[pos][0] == 67) else [], 1 if tokenList[pos][0] == 67 else 0, 0)
   treeStack.append(newNode)
   stack.append(tokenList[pos][0])
   stack.append(num)
   print(stack)
-
-  if((tokenList[pos][0] == 7 and ) or tokenList[pos][0] == 79):
-    currNode = scopeNode(currNode, {})
-  elif(tokenList[pos][0] == 8):
-    currNode = currNode.parent
 
   if (asked == False):
     if (pos < len(tokenList)):
@@ -3525,20 +3536,73 @@ def reduce(f, c):
 
   x = int(stack[-1])
   stack.append(nonTerminal)
-  if (nonTerminal == "fun-def"):
-    tryAddingSymbolFunction(nonTerminal, chn)
-  elif(nonTerminal == "id-list"):
-    tryAddingSymbolVariable(nonTerminal, chn, 0)
-  elif(len(chn) > 0 and nonTerminal == "id-list-cont"):
-    tryAddingSymbolVariable(nonTerminal, chn, 1)
-  treeStack.append(Node(nonTerminal, chn))
+  
+  idCount = 0
+  paramCount = 0
+  for ch in chn:
+    idCount += ch.idCount
+    paramCount += ch.paramCount
+  
+  if ((nonTerminal == "expr-list" or nonTerminal == "expr-list-cont") and len(chn) != 0):
+    paramCount += 1
+
+  treeStack.append(Node(nonTerminal, chn, idCount, paramCount))
   goNum = gotoTable[x][nonTerminals[nonTerminal]]
   stack.append(goNum)
 
-def printTree(node, level,f):
-    print('#'*level ,node.val,file=f)
-    for ch in node.chn:
-      printTree(ch, level+1, f)
+# --------------------- Semantical analyze --------------------------------
+def printTree(node, level, f, parent):
+  global currNode
+
+  if((node.val == "{" and parent.val != "fun-def") or node.val == "param-list"):
+    currNode = scopeNode(currNode, set())
+  elif(node.val == "}"):
+    currNode = currNode.parent
+
+  if (node.val == "fun-def"):
+    tryAddingSymbolFunction(node.val, node.chn)
+  elif(node.val == "id-list"):
+    tryAddingSymbolVariable(node.val, node.chn, 0)
+  elif(len(node.chn) > 0 and node.val == "id-list-cont"):
+    tryAddingSymbolVariable(node.val, node.chn, 1)
+  
+  if (node.val == "stmt-assign" or node.val == "expr-primary" or node.val == "stmt-incr" or node.val == "stmt-decr"):
+    posId = 0 if(node.val == "stmt-assign" or node.val == "expr-primary") else 1
+    if (node.chn[posId].val == "id"):
+      id = node.chn[posId].chn[0].val
+      navNode = currNode
+
+      found = False
+
+      while(navNode != rootNode):
+        if ((id, 'V') in navNode.table):
+          found = True
+          break
+        navNode = navNode.parent
+      
+      node.found = found
+
+  print('#'*level ,node.val, file=f)
+  for ch in node.chn:
+    printTree(ch, level+1, f, node)
+
+  if (node.val == "fun-call" and (node.chn[0].chn[0].val, 'F', node.paramCount) not in rootNode.table): #Check if the function does not exists
+    print(Fore.RED + "The function " + node.chn[0].chn[0].val + f'({node.paramCount})' + " is not declared "+ Fore.WHITE)
+    exit(-1)
+
+def handleSemanticErrors(node):
+  if (node.val == "stmt-assign" or node.val == "expr-primary" or node.val == "stmt-incr" or node.val == "stmt-decr"):
+    posId = 0 if(node.val == "stmt-assign" or node.val == "expr-primary") else 1
+
+    if (node.chn[posId].val == "id"):
+      id = node.chn[posId].chn[0].val
+      if (not node.found and (id, 'V') not in rootNode.table):
+        print(Fore.RED + "Variable " + id + " does not exist" + Fore.WHITE)
+        exit(-1)
+      
+
+  for ch in node.chn:
+    handleSemanticErrors(ch)
   
 # ------------------- Driver code ------------------------------
 
@@ -3546,4 +3610,8 @@ readFile() # Open and red the file
 lexicalAnalize() #Lexical analyze
 syntacticalAnalyze() #Syntactical analyze
 with open ('./TreeFile.txt', mode='w') as f:  #Print the tree
-  printTree(treeStack[-1], 1,f)
+  printTree(treeStack[-1], 1, f, None)
+if(mainNotDefined):
+  print(Fore.RED + "Main function is not defined" + Fore.WHITE)
+  exit(-1)
+handleSemanticErrors(treeStack[-1])

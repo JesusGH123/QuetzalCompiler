@@ -1,15 +1,15 @@
-/* File: breaks.quetzal
-   Verifies that the implementation of the break statement meets the
-   specified requirements.
-   (C) 2022 Ariel Ortiz, ITESM CEM.
- */
-
-sqr(x) {
+sqr() {
     return x * x;
+}
+var x;
+
+sqr(x,y) {
+    
+    return x * y;
 }
 
 main() {
-    var array, sum, i, j, x, i;
+    var sqr, array, sum, j, i, x;
     sum = 0;
     i = 0;
     
@@ -19,6 +19,6 @@ main() {
         }
         
     }
-    
+
     prints("The program works fine!\n");
 }

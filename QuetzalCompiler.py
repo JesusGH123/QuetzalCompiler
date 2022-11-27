@@ -146,6 +146,7 @@ def lexicalAnalize():
           currToken = currToken + line[i]
 
     currLine = currLine + 1
+  print("Validate", line[i])
   classifyTokens()
 
 
@@ -161,7 +162,8 @@ def classifyTokens():
       literalValidaton(readedTokens[i][0], readedTokens[i][1])
 
 def literalValidaton(token, line):
-  if (token[0] == '"' and token[len(token) - 1] == '"'):  #String literal (63)
+  if ((token[0] == '"' and token[len(token) - 1] == '"') or 
+      token[0] == "'" and token[len(token) - 1] == "'"):  #String literal (63)
     tokenList.append((63, line))
     #print(token, 63)
   elif (re.match(r'(^[\+|\-]?[0-9]*$)', token)):  #Numeric literal (64)
@@ -173,7 +175,7 @@ def literalValidaton(token, line):
       exit(-1)
     
     tokenList.append((64, line))
-    #print(token, 64)
+    print("Number: ", line, 64)
   elif (token == "false" or token == "true"):  #Boolean literal (65)
     tokenList.append((65, line))
     #print(token, 65)
@@ -3548,7 +3550,8 @@ def reduce(f, c):
   paramCount = 0
   for ch in chn:
     idCount += ch.idCount
-    paramCount += ch.paramCount
+    if(ch.val != "fun-call"):
+      paramCount += ch.paramCount
   
   if ((nonTerminal == "expr-list" or nonTerminal == "expr-list-cont") and len(chn) != 0):
     paramCount += 1

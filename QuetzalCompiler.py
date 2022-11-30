@@ -39,6 +39,8 @@ analyzedLine = 1
 
 mainNotDefined = True
 
+currScope = 0
+
 class Grammar:
   def __init__(self, var, prod):
     self.var = var
@@ -58,9 +60,10 @@ class Node:
     self.found = False
 
 class scopeNode:
-  def __init__(self, parent, table):
+  def __init__(self, parent, table, scope):
     self.parent = parent
     self.table = table
+    self.scope = scope
 
 currNode = scopeNode(None, {("printi", 'F', 1),
                             ("printc", 'F', 1),
@@ -72,7 +75,8 @@ currNode = scopeNode(None, {("printi", 'F', 1),
                             ("size", 'F', 1),
                             ("add", 'F', 2),
                             ("get", 'F', 2),
-                            ("set", 'F', 3)})  #Initializing symbol table tree
+                            ("set", 'F', 3)},
+                          0)  #Initializing symbol table tree
 rootNode = currNode
 
 # ----------------- Lexical analyze ----------------------------
@@ -3480,6 +3484,7 @@ def tryAddingSymbolFunction(nonTerminal, chn):
     mainNotDefined = False
 
   currNode.table.add(tokenId)
+  print(tokenId, "Scope: ", currNode.scope)
 
 def tryAddingSymbolVariable(nonTerminal, chn, pos):
   tokenId = (chn[pos].chn[0].val, 'V')
@@ -3488,6 +3493,7 @@ def tryAddingSymbolVariable(nonTerminal, chn, pos):
     exit(-1)
   
   currNode.table.add(tokenId)
+  print(tokenId, "Scope: ", currNode.scope)
 
 def shift(f, c):
   global asked
@@ -3562,6 +3568,7 @@ def reduce(f, c):
 
 # --------------------- Semantical analyze --------------------------------
 def printTree(node, level, f, parent, insideLoop = False):
+  global currScope
   global currNode
 
   if(node.val == "stmt-break" and not insideLoop):
@@ -3569,7 +3576,8 @@ def printTree(node, level, f, parent, insideLoop = False):
     exit(-1)
 
   if((node.val == "{" and parent.val != "fun-def") or node.val == "param-list"):
-    currNode = scopeNode(currNode, set())
+    currScope += 1
+    currNode = scopeNode(currNode, set(), currScope)
   elif(node.val == "}"):
     currNode = currNode.parent
 
@@ -3622,6 +3630,7 @@ def handleSemanticErrors(node):
 readFile() # Open and red the file
 lexicalAnalize() #Lexical analyze
 syntacticalAnalyze() #Syntactical analyze
+print(Fore.YELLOW + "Symbol table" + Fore.WHITE)
 with open ('./TreeFile.txt', mode='w') as f:  #Print the tree
   printTree(treeStack[-1], 1, f, None)
 if(mainNotDefined):
